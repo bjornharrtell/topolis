@@ -1,0 +1,44 @@
+{
+  "name": "topolis",
+  "description": "JavaScript topology representation and manipulation",
+  "version": "0.1.0",
+  "author": "Björn Harrtell <bjorn@wololo.org>",
+  "keywords": [
+    "JSTS",
+    "JavaScript",
+    "JTS",
+    "Java",
+    "Topology",
+    "Geometry"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "jsts": "1.2.1",
+    "rbush": "2.0.1",
+    "babel-core": "6.18.0",
+    "babel-preset-es2015": "6.18.0",
+    "babel-register": "6.18.0",
+    "coveralls": "2.11.14",
+    "expect.js": "0.3.1",
+    "git-rev-sync": "1.8.0",
+    "jsdoc": "jsdoc3/jsdoc",
+    "mocha": "3.1.2",
+    "mocha-lcov-reporter": "1.2.0",
+    "nyc": "8.3.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/bjornharrtell/topolis.git"
+  },
+  "standard": {
+    "globals": [
+      "describe",
+      "it"
+    ]
+  },
+  "scripts": {
+    "test": "NODE_PATH=src nyc mocha --timeout 10s --compilers js:babel-register --recursive test",
+    "coverage": "nyc report --reporter=text-lcov | coveralls",
+    "build-jsdoc": "jsdoc -c doc/config.json"
+  }
+}
