@@ -1,5 +1,8 @@
+import SpatialError from './SpatialError'
+import { isSimple, intersects } from './utils'
+
 export function add (topology, start, end, coordinates) {
-  const { nodes, nodesTree, edges, edgesTree } = topology
+  const { edges, edgesTree } = topology
 
   const xs = coordinates.map(c => c[0])
   const ys = coordinates.map(c => c[1])
@@ -11,19 +14,29 @@ export function add (topology, start, end, coordinates) {
   }
 
   const bounds = {
-      minX: Math.min(...xs),
-      minY: Math.min(...ys),
-      maxX: Math.max(...xs),
-      maxY: Math.max(...ys),
-      edge
+    minX: Math.min(...xs),
+    minY: Math.min(...ys),
+    maxX: Math.max(...xs),
+    maxY: Math.max(...ys),
+    edge
   }
 
-  if (!edgesTree.collides(bounds)) {
-    // TODO: need to check for line intersections
-    edgesTree.insert(bounds)
-    edges.push(edge)
-    return edges.length
-  } else {
-    return -1
+  if (start === end) {
+    throw new SpatialError(1, 'start and end node cannot be the same as it would not construct an isolated edge')
   }
+
+  if (!isSimple(coordinates)) {
+    throw new SpatialError(2, 'curve not simple')
+  }
+
+  const result = edgesTree.search(bounds)
+  const crossingResult = result.find(r => intersects(r.edge.coordinates, coordinates))
+
+  if (crossingResult) {
+    throw new SpatialError(3, 'geometry crosses edge ' + edges.indexOf(crossingResult.edge))
+  }
+
+  edgesTree.insert(bounds)
+  edges.push(edge)
+  return edges.length
 }
