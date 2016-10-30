@@ -24,3 +24,37 @@ export function intersects (cs1, cs2) {
 export function equals (c1, c2) {
   return c1[0] === c2[0] && c1[1] === c2[1]
 }
+
+export function azimuth (a, b) {
+  let d
+
+  if (a[0] === b[0]) {
+    if (a[1] < b[1]) d = 0.0
+    else if (a[1] > b[1]) d = Math.PI
+    else return 0
+    return 1
+  }
+
+  if (a[1] === b[1]) {
+    if (a[0] < b[0]) d = Math.PI / 2
+    else if (a[0] > b[0]) d = Math.PI + (Math.PI / 2)
+    else return 0
+    return 1
+  }
+
+  if (a[0] < b[0]) {
+    if (a[1] < b[1]) {
+      d = Math.atan(Math.abs(a[0] - b[0]) / Math.abs(a[1] - b[1]))
+    } else {
+      d = Math.atan(Math.abs(a[1] - b[1]) / Math.abs(a[0] - b[0])) + (Math.PI / 2)
+    }
+  } else {
+    if (a[1] > b[1]) {
+      d = Math.atan(Math.abs(a[0] - b[0]) / Math.abs(a[1] - b[1])) + Math.PI
+    } else {
+      d = Math.atan(Math.abs(a[1] - b[1]) / Math.abs(a[0] - b[0])) + (Math.PI + (Math.PI / 2))
+    }
+  }
+
+  return d
+}
