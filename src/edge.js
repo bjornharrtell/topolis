@@ -1,5 +1,5 @@
 import SpatialError from './SpatialError'
-import { isSimple, intersects } from './utils'
+import { isSimple, intersects, equals } from './utils'
 
 export function add (topology, start, end, coordinates) {
   const { edges, edgesTree } = topology
@@ -25,6 +25,15 @@ export function add (topology, start, end, coordinates) {
     throw new SpatialError(1, 'start and end node cannot be the same as it would not construct an isolated edge')
   }
 
+  if (start.face !== end.face) {
+    throw new SpatialError(1, 'nodes in different faces')
+  }
+
+  if (!equals(start.coordinate, coordinates[0]) ||
+      !equals(end.coordinate, coordinates[coordinates.length - 1])) {
+    throw new SpatialError(1, 'end node not geometry end point')
+  }
+
   if (!isSimple(coordinates)) {
     throw new SpatialError(2, 'curve not simple')
   }
@@ -38,5 +47,5 @@ export function add (topology, start, end, coordinates) {
 
   edgesTree.insert(bounds)
   edges.push(edge)
-  return edges.length
+  return edge
 }

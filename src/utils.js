@@ -20,3 +20,7 @@ export function intersects (cs1, cs2) {
   const ls2 = toLineString(cs1)
   return RelateOp.intersects(ls1, ls2)
 }
+
+export function equals (c1, c2) {
+  return c1[0] === c2[0] && c1[1] === c2[1]
+}

@@ -12,14 +12,14 @@ beforeEach(() => {
 describe('node', () => {
   describe('add', () => {
     it('should be able to add a single node to an empty topology', () => {
-      const id = add(topology, [0, 0])
-      expect(id).to.equal(1)
+      const node = add(topology, [0, 0])
+      expect(node).to.ok()
     })
     it('should refuse to add overlapping nodes to an empty topology', () => {
-      const id1 = add(topology, [0, 0])
-      expect(id1).to.equal(1)
-      const id2 = add(topology, [0, 0])
-      expect(id2).to.equal(-1)
+      const node1 = add(topology, [0, 0])
+      expect(node1).to.ok()
+      const node2 = add(topology, [0, 0])
+      expect(node1).to.ok()
     })
   })
 })
