@@ -22,27 +22,31 @@ export function add (topology, start, end, coordinates) {
   }
 
   if (start === end) {
-    throw new SpatialError(1, 'start and end node cannot be the same as it would not construct an isolated edge')
+    throw new SpatialError('start and end node cannot be the same as it would not construct an isolated edge')
+  }
+
+  if (!start.face || !end.face) {
+    throw new SpatialError('not isolated node')
   }
 
   if (start.face !== end.face) {
-    throw new SpatialError(1, 'nodes in different faces')
+    throw new SpatialError('nodes in different faces')
   }
 
   if (!equals(start.coordinate, coordinates[0]) ||
       !equals(end.coordinate, coordinates[coordinates.length - 1])) {
-    throw new SpatialError(1, 'end node not geometry end point')
+    throw new SpatialError('end node not geometry end point')
   }
 
   if (!isSimple(coordinates)) {
-    throw new SpatialError(2, 'curve not simple')
+    throw new SpatialError('curve not simple')
   }
 
   const result = edgesTree.search(bounds)
   const crossingResult = result.find(r => intersects(r.edge.coordinates, coordinates))
 
   if (crossingResult) {
-    throw new SpatialError(3, 'geometry crosses edge ' + edges.indexOf(crossingResult.edge))
+    throw new SpatialError('geometry crosses edge ' + edges.indexOf(crossingResult.edge))
   }
 
   edgesTree.insert(bounds)

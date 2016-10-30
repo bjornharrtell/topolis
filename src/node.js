@@ -1,8 +1,10 @@
-export function add (topology, coordinate) {
-  const { nodes, nodesTree: tree } = topology
+import SpatialError from './SpatialError'
 
-  // TODO: determine face
-  const face = undefined
+export function add (topology, coordinate) {
+  const { nodes, nodesTree: tree, faces } = topology
+
+  // TODO: determine true face
+  const face = faces[0]
 
   const node = {
     face,
@@ -25,6 +27,6 @@ export function add (topology, coordinate) {
     nodes.push(node)
     return node
   } else {
-    return -1
+    throw new SpatialError('coincident node')
   }
 }

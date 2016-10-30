@@ -16,10 +16,11 @@ describe('node', () => {
       expect(node).to.ok()
     })
     it('should refuse to add overlapping nodes to an empty topology', () => {
-      const node1 = add(topology, [0, 0])
-      expect(node1).to.ok()
-      const node2 = add(topology, [0, 0])
-      expect(node1).to.ok()
+      const node = add(topology, [0, 0])
+      expect(node).to.ok()
+      expect(() => {
+        add(topology, [0, 0])
+      }).to.throwException(/^coincident node$/)
     })
   })
 })
