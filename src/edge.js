@@ -146,5 +146,5 @@ function addEdge (topology, start, end, coordinates, modFace) {
 }
 
 export function addEdgeNewFaces (topology, start, end, coordinates) {
-  addEdge(topology, start, end, coordinates, false)
+  return addEdge(topology, start, end, coordinates, false)
 }

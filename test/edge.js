@@ -2,7 +2,7 @@ import expect from 'expect.js'
 
 import { create as createTopology } from '../src/topology'
 import { addIsoNode } from '../src/node'
-import { addIsoEdge } from '../src/edge'
+import { addIsoEdge, addEdgeNewFaces } from '../src/edge'
 
 let topology
 
@@ -11,7 +11,7 @@ beforeEach(() => {
 })
 
 describe('edge', () => {
-  describe('add', () => {
+  describe('addIsoEdge', () => {
     it('should be able to add an edge to an empty topology', () => {
       const start = addIsoNode(topology, [0, 0])
       const end = addIsoNode(topology, [1, 1])
@@ -44,6 +44,25 @@ describe('edge', () => {
       expect(() => {
         addIsoEdge(topology, start2, end2, [[0, 1], [1, 0]])
       }).to.throwException(/^geometry crosses edge 0$/)
+    })
+  })
+
+  describe('addEdgeNewFaces', () => {
+    it('should be able to add a closed edge to an empty topology', () => {
+      const node = addIsoNode(topology, [0, 0])
+      const edge = addEdgeNewFaces(topology, node, node, [[0, 0], [0, 1], [1, 1], [0, 0]])
+
+      const universe = topology.faces[0]
+      const newFace = topology.faces[1]
+
+      expect(edge.start).to.eql(node)
+      expect(edge.end).to.eql(node)
+      expect(edge.next_left).to.eql(edge)
+      expect(edge.next_left_dir).to.be(true)
+      expect(edge.next_right).to.eql(edge)
+      expect(edge.next_right_dir).to.be(false)
+      expect(edge.left_face).to.eql(universe)
+      expect(edge.right_face).to.eql(newFace)
     })
   })
 })
