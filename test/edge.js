@@ -63,6 +63,12 @@ describe('edge', () => {
       expect(edge.nextRightDir).to.be(false)
       expect(edge.leftFace).to.eql(universe)
       expect(edge.rightFace).to.eql(newFace)
+
+      /* equivalent postgis topo
+      select createtopology('topo4', 0, 0)
+      select st_addisonode('topo4', 0, ST_GeomFromText('POINT(0 0)'))
+      select st_addedgenewfaces('topo4', 1, 1, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1, 0 0)'))
+      */
     })
   })
 })
