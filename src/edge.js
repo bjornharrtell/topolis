@@ -147,9 +147,133 @@ function findAdjacentEdges (topology, node, data, other, edge) {
   return edges
 }
 
-function addFaceSplit () {
-  // TODO: implement
-  // TODO: need to know edge direction
+function getRingEdges (topology, edge, dir, limit) {
+  // const edges = topology.edges
+  const foundEdges = []
+  foundEdges.push({ edge, dir })
+
+  edge = dir ? edge.nextLeft : edge.nextRight
+  dir = dir ? edge.nextLeftDir : edge.nextRightDir
+
+  if (foundEdges.indexOf(edge) >= 0) {
+    foundEdges.push({ edge, dir })
+    // TODO: recurse...
+  }
+
+  return foundEdges
+}
+
+function getEdgeByFace (topology, face, mbr) {
+  return topology.edges.filter(e => e.leftFace === face || e.rightFace === face)
+  // TODO: include within mbr
+}
+
+function signedArea (shell) {
+  if (shell.length < 3) {
+    return 0
+  }
+  let sum = 0
+  let x
+  let y1
+  let y2
+  let p1 = shell[0]
+  let p2 = shell[1]
+  const x0 = p1[0]
+  for (let i = 2; i < shell.length; i++) {
+    let p3 = shell[i]
+    x = p2[0] - x0
+    y1 = p3[1]
+    y2 = p1[1]
+    sum += x * (y2 - y1)
+    p1 = p2
+    p2 = p3
+  }
+  return sum / 2
+}
+
+function getInteriorEdgePoint (coordinates) {
+  // TODO: too naive
+  return coordinates[1]
+}
+
+function addFaceSplit (topology, edge, dir, face, mbrOnly) {
+  const universe = topology.faces[0]
+
+  const edges = getRingEdges(topology, edge, dir, 0)
+
+  const newFace = { }
+
+  const shell = edges
+    .map(e => e.edge.coordinates)
+    .reduce((a, b) => a.concat(b), [])
+
+  const isccw = signedArea(shell) <= 0
+
+  if (face === universe) {
+    if (!isccw) {
+      return -1
+    }
+  }
+
+  if (mbrOnly && face !== universe) {
+    if (isccw) {
+      // TODO: update mbr for face
+    }
+    return -1
+  }
+
+  if (face !== universe && !isccw) {
+    // TODO: newFace mbr shuld be same as face
+  } else {
+    // TODO: newFace mbr shuld be shellbox
+  }
+
+  topology.faces.push(newFace)
+
+  const newFaceIsOutside = face !== universe && !isccw
+
+  const faceEdges = getEdgeByFace(topology, face, newFace)
+  faceEdges.forEach(e => {
+    let found = 0
+    edges.forEach(be => {
+      if (e === be.edge) {
+        if (be.dir) {
+          e.leftFace = newFace
+        } else {
+          e.rightFace = newFace
+        }
+        found++
+        if (found === 2) {
+          return
+        }
+      }
+      if (found > 0) {
+        return
+      }
+
+      const ep = getInteriorEdgePoint(edge.coordinates)
+      const contains = contains(ep, shell) > 0
+
+      if (newFaceIsOutside) {
+        if (contains) {
+          return
+        }
+      } else {
+        if (!contains) {
+          return
+        }
+      }
+
+      if (e.leftFace === face) {
+        e.leftFace = newFace
+      }
+
+      if (e.rightFace === face) {
+        e.rightFace = newFace
+      }
+    })
+  })
+
   return 0
 }
 
@@ -312,13 +436,13 @@ function addEdge (topology, start, end, coordinates, modFace) {
   let newface1
 
   if (!modFace) {
-    newface1 = addFaceSplit(topology, edge, edge.leftFace, 0)
+    newface1 = addFaceSplit(topology, edge, edge.leftFace, edge.leftFaceDir, 0)
     if (newface1 === 0) {
       return edge
     }
   }
 
-  let newface = addFaceSplit(topology, edge, edge.leftFace, 0)
+  let newface = addFaceSplit(topology, edge, edge.leftFace, edge.leftFaceDir, 0)
 
   if (modFace) {
     if (newface === 0) {
@@ -326,7 +450,7 @@ function addEdge (topology, start, end, coordinates, modFace) {
     }
 
     if (newface < 0) {
-      newface = addFaceSplit(topology, edge, edge.leftFace, 0)
+      newface = addFaceSplit(topology, edge, edge.leftFace, edge.leftFaceDir, 0)
       if (newface === 0) {
         return edge
       }

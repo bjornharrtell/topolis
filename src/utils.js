@@ -58,3 +58,30 @@ export function azimuth (a, b) {
 
   return d
 }
+
+function isLeft (c0, c1, c2) {
+  return ((c1[0] - c0[0]) * (c2[1] - c0[1])) - ((c2[0] - c0[0]) * (c1[1] - c0[1]))
+}
+
+export function contains (c, shell) {
+  let wn = 0
+  for (let i = 0; i < shell.length - 1; i++) {
+    const va = shell[i]
+    if (va[1] <= c[1]) {
+      const vb = shell[i + 1]
+      if (vb[1] > c[1]) {
+        if (isLeft(va, vb, c) > 0) {
+          wn++
+        }
+      }
+    } else {
+      const vb = shell[i + 1]
+      if (vb[1] <= c[1]) {
+        if (isLeft(va, vb, c) < 0) {
+          wn--
+        }
+      }
+    }
+  }
+  return wn
+}
