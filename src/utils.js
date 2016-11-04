@@ -2,6 +2,7 @@ import Coordinate from '../node_modules/jsts/src/org/locationtech/jts/geom/Coord
 import GeometryFactory from '../node_modules/jsts/src/org/locationtech/jts/geom/GeometryFactory'
 import IsSimpleOp from '../node_modules/jsts/src/org/locationtech/jts/operation/IsSimpleOp'
 import RelateOp from '../node_modules/jsts/src/org/locationtech/jts/operation/relate/RelateOp'
+import BoundaryNodeRule from '../node_modules/jsts/src/org/locationtech/jts/algorithm/BoundaryNodeRule'
 
 const factory = new GeometryFactory()
 const isSimpleOp = new IsSimpleOp()
@@ -15,10 +16,10 @@ export function isSimple (coordinates) {
   return isSimpleOp.isSimpleLinearGeometry(lineString)
 }
 
-export function intersects (cs1, cs2) {
+export function relate (cs1, cs2) {
   const ls1 = toLineString(cs1)
-  const ls2 = toLineString(cs1)
-  return RelateOp.intersects(ls1, ls2)
+  const ls2 = toLineString(cs2)
+  return RelateOp.relate(ls1, ls2, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE)
 }
 
 export function equals (c1, c2) {

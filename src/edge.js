@@ -1,5 +1,5 @@
 import SpatialError from './SpatialError'
-import { isSimple, intersects, equals, azimuth } from './utils'
+import { isSimple, relate, equals, azimuth } from './utils'
 
 export function addIsoEdge (topology, start, end, coordinates) {
   const { edges, edgesTree } = topology
@@ -10,15 +10,11 @@ export function addIsoEdge (topology, start, end, coordinates) {
   const edge = {
     start,
     end,
-    coordinates
-  }
-
-  const bounds = {
+    coordinates,
     minX: Math.min(...xs),
     minY: Math.min(...ys),
     maxX: Math.max(...xs),
-    maxY: Math.max(...ys),
-    edge
+    maxY: Math.max(...ys)
   }
 
   if (start === end) {
@@ -45,12 +41,7 @@ export function addIsoEdge (topology, start, end, coordinates) {
     throw new SpatialError('curve not simple')
   }
 
-  const result = edgesTree.search(bounds)
-  const crossingResult = result.find(r => intersects(r.edge.coordinates, coordinates))
-
-  if (crossingResult) {
-    throw new SpatialError('geometry crosses edge ' + edges.indexOf(crossingResult.edge))
-  }
+  checkEdgeCrossing(topology, start, end, edge)
 
   edge.leftFace = end.face
   edge.nextLeft = edge
@@ -61,9 +52,29 @@ export function addIsoEdge (topology, start, end, coordinates) {
   delete start.face
   delete end.face
 
-  edgesTree.insert(bounds)
+  edgesTree.insert(edge)
   edges.push(edge)
   return edge
+}
+
+function checkEdgeCrossing (topology, start, end, edge) {
+  const check = (e1, e2) => {
+    const id = topology.edges.indexOf(e1)
+    if (e1 === e2) {
+      return
+    }
+    const im = relate(e1.coordinates, e2.coordinates)
+    if (im.matches('1FFF*FFF2')) {
+      throw new SpatialError('coincident edge ' + id)
+    }
+    if (im.matches('1********')) {
+      throw new SpatialError('geometry intersects edge ' + id)
+    }
+    if (im.matches('T********')) {
+      throw new SpatialError('geometry crosses edge ' + id)
+    }
+  }
+  topology.edgesTree.search(edge).forEach(e => check(e, edge))
 }
 
 function getEdgesByNode (topology, node) {
@@ -286,15 +297,11 @@ function addEdge (topology, start, end, coordinates, modFace) {
   const edge = {
     start,
     end,
-    coordinates
-  }
-
-  const bounds = {
+    coordinates,
     minX: Math.min(...xs),
     minY: Math.min(...ys),
     maxX: Math.max(...xs),
-    maxY: Math.max(...ys),
-    edge
+    maxY: Math.max(...ys)
   }
 
   edge.leftFace = undefined
@@ -339,11 +346,7 @@ function addEdge (topology, start, end, coordinates, modFace) {
     throw new SpatialError('end node not geometry end point')
   }
 
-  const result = edgesTree.search(bounds)
-  const crossingResult = result.find(r => intersects(r.edge.coordinates, coordinates))
-  if (crossingResult) {
-    throw new SpatialError('geometry crosses edge ' + edges.indexOf(crossingResult.edge))
-  }
+  checkEdgeCrossing(topology, start, end, edge)
 
   const isClosed = start === end
   const foundStart = findAdjacentEdges(topology, start, span, isClosed ? epan : null, -1)
@@ -426,7 +429,7 @@ function addEdge (topology, start, end, coordinates, modFace) {
 
   // TODO: set containing_face = null for start_node and end_node
 
-  edgesTree.insert(bounds)
+  edgesTree.insert(edge)
   edges.push(edge)
 
   if (!isClosed && (epan.wasIsolated || span.wasIsolated)) {

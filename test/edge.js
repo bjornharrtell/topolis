@@ -44,6 +44,16 @@ describe('edge', () => {
       expect(() => {
         addIsoEdge(topology, start2, end2, [[0, 1], [1, 0]])
       }).to.throwException(/^geometry crosses edge 0$/)
+      /* equivalent postgis topo
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
+      select st_addisoedge('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 1 1)'));
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 1)'));
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 0)'));
+      select st_addisoedge('topo5', 3, 4, ST_GeomFromText('LINESTRING(0 1, 1 0)'));
+      */
     })
   })
 
@@ -68,6 +78,43 @@ describe('edge', () => {
       select createtopology('topo4', 0, 0)
       select st_addisonode('topo4', 0, ST_GeomFromText('POINT(0 0)'))
       select st_addedgenewfaces('topo4', 1, 1, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1, 0 0)'))
+      */
+    })
+
+    it('should be able to add two edges forming a face to an empty topology', () => {
+      const node1 = addIsoNode(topology, [0, 0])
+      const node2 = addIsoNode(topology, [1, 1])
+      const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]])
+      const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]])
+
+      const universe = topology.faces[0]
+      const newFace = topology.faces[1]
+
+      expect(edge1.start).to.eql(node1)
+      expect(edge1.end).to.eql(node2)
+      expect(edge1.nextLeft).to.eql(edge1)
+      expect(edge1.nextLeftDir).to.be(true)
+      expect(edge1.nextRight).to.eql(edge1)
+      expect(edge1.nextRightDir).to.be(false)
+      expect(edge1.leftFace).to.eql(universe)
+      expect(edge1.rightFace).to.eql(newFace)
+
+      expect(edge2.start).to.eql(node2)
+      expect(edge2.end).to.eql(node1)
+      expect(edge2.nextLeft).to.eql(edge1)
+      expect(edge2.nextLeftDir).to.be(true)
+      expect(edge2.nextRight).to.eql(edge1)
+      expect(edge2.nextRightDir).to.be(false)
+      expect(edge2.leftFace).to.eql(universe)
+      expect(edge2.rightFace).to.eql(newFace)
+
+      /* equivalent postgis topo
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
+      select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
+      select st_addedgenewfaces('topo5', 2, 1, ST_GeomFromText('LINESTRING(1 1, 1 0, 0 0)'));
       */
     })
   })
