@@ -163,17 +163,15 @@ function findAdjacentEdges (topology, node, data, other, edge) {
   return edges
 }
 
-function getRingEdges (topology, edge, dir, limit) {
-  // const edges = topology.edges
-  const foundEdges = []
+function getRingEdges (topology, edge, dir, limit, foundEdges) {
+  foundEdges = foundEdges || []
   foundEdges.push({ edge, dir })
 
   edge = dir ? edge.nextLeft : edge.nextRight
   dir = dir ? edge.nextLeftDir : edge.nextRightDir
 
-  if (foundEdges.indexOf(edge) >= 0) {
-    foundEdges.push({ edge, dir })
-    // TODO: recurse...
+  if (!foundEdges.some(fe => fe.edge === edge && fe.dir === dir)) {
+    getRingEdges(topology, edge, dir, 0, foundEdges)
   }
 
   return foundEdges
@@ -268,7 +266,7 @@ function addFaceSplit (topology, edge, dir, face, mbrOnly) {
       }
 
       const ep = getInteriorEdgePoint(edge.coordinates)
-      const contains = contains(ep, shell) > 0
+      const contains = contains(ep, shell) !== 0
 
       if (newFaceIsOutside) {
         if (contains) {
@@ -324,7 +322,6 @@ function addEdge (topology, start, end, coordinates, modFace) {
     az: azimuth(coordinates[coordinates.length - 1], coordinates[coordinates.length - 2])
   }
 
-  // TODO: check 'geometry crosses an edge'
   const nodes = start !== end ? [start, end] : [start]
 
   nodes.forEach(node => {
@@ -333,7 +330,7 @@ function addEdge (topology, start, end, coordinates, modFace) {
         edge.leftFace = edge.rightFace = node.face
       } else if (edge.leftFace !== node.face) {
         const id1 = faces.indexOf[edge.leftFace]
-        const id2 = faces.indexOf[edge.leftFace]
+        const id2 = faces.indexOf[node.face]
         throw new SpatialError(`geometry crosses an edge (endnodes in faces ${id1} and ${id2})`)
       }
     }
@@ -360,12 +357,16 @@ function addEdge (topology, start, end, coordinates, modFace) {
     if (span.nextCW) {
       edge.nextRight = span.nextCW
       edge.nextRightDir = span.nextCWDir
-      prevLeft = span.nextCCW
-      prevLeftDir = !span.nextCCWDir
     } else {
       edge.nextRight = edge
       edge.nextRightDir = false
+    }
+    if (span.nextCCW) {
+      prevLeft = span.nextCCW
+      prevLeftDir = !span.nextCCWDir
+    } else {
       prevLeft = edge
+      prevLeftDir = true
     }
     if (!edge.rightFace) {
       edge.rightFace = span.cwFace
@@ -391,10 +392,14 @@ function addEdge (topology, start, end, coordinates, modFace) {
     if (epan.nextCW) {
       edge.nextLeft = epan.nextCW
       edge.nextLeftDir = epan.nextCWDir
+    } else {
+      edge.nextLeft = edge
+      edge.nextLeftDir = true
+    }
+    if (epan.nextCCW) {
       prevRight = epan.nextCCW
       prevRightDir = !epan.nextCCWDir
     } else {
-      edge.nextLeft = edge
       prevRight = edge
       prevRightDir = false
     }
@@ -416,7 +421,11 @@ function addEdge (topology, start, end, coordinates, modFace) {
     prevRightDir = !isClosed
   }
 
-  // TODO: check "faces mismatch: invalid topology"
+  if (edge.leftFace !== edge.rightFace) {
+    throw new Error('faces mismatch: invalid topology')
+  } else if (!edge.leftFace) {
+    throw new Error('Could not derive edge face from linked primitives: invalid topology ?')
+  }
 
   if (prevLeft !== edge) {
     if (prevLeftDir) {
