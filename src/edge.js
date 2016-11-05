@@ -311,10 +311,6 @@ function addEdge (topology, start, end, coordinates, modFace) {
 
   edge.leftFace = undefined
   edge.rightFace = undefined
-  // edge.nextLeft = edge
-  // edge.nextLeftDir = true
-  // edge.nextRight = edge
-  // edge.nextRightDir = true
 
   const span = {
     cwFace: undefined,
