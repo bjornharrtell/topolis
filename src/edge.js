@@ -78,12 +78,12 @@ function checkEdgeCrossing (topology, start, end, edge) {
 }
 
 function getEdgesByNode (topology, node) {
-  return topology.edges.filter(e => e.start !== node && e.end !== node)
+  return topology.edges.filter(e => e.start === node || e.end === node)
 }
 
 function findAdjacentEdges (topology, node, data, other, edge) {
-  data.nextCW = data.nextCCW = 0
-  data.cwFace = data.ccwFace = -1
+  data.nextCW = data.nextCCW = undefined
+  data.cwFace = data.ccwFace = undefined
 
   let minaz, maxaz, azdif
 
@@ -101,14 +101,15 @@ function findAdjacentEdges (topology, node, data, other, edge) {
     }
 
     if (e.coordinates.length < 2) {
-      // TODO: throw
+      const id = topology.edges.indexOf[e]
+      throw new Error(`corrupted topology: edge ${id} does not have two distinct points`)
     }
 
     if (e.start === node) {
       const az = azimuth(e.coordinates[0], e.coordinates[1])
       azdif = az - data.az
       if (azdif < 0) azdif += 2 * Math.PI
-      if (!minaz) {
+      if (minaz === undefined) {
         minaz = maxaz = azdif
         data.nextCW = data.nextCCW = e
         data.nextCWDir = data.nextCCWDir = true
@@ -133,27 +134,31 @@ function findAdjacentEdges (topology, node, data, other, edge) {
       const az = azimuth(e.coordinates[e.coordinates.length - 1], e.coordinates[e.coordinates.length - 2])
       azdif = az - data.az
       if (azdif < 0) azdif += 2 * Math.PI
-      if (!minaz) {
+      if (minaz === undefined) {
         minaz = maxaz = azdif
         data.nextCW = data.nextCCW = e
         data.nextCWDir = data.nextCCWDir = false
-        data.cwFace = e.leftFace
-        data.ccwFace = e.rightFace
+        data.cwFace = e.rightFace
+        data.ccwFace = e.leftFace
       } else {
         if (azdif < minaz) {
           data.nextCW = e
           data.nextCWDir = false
-          data.cwFace = e.leftFace
+          data.cwFace = e.rightFace
           minaz = azdif
         } else if (azdif > maxaz) {
           data.nextCCW = e
           data.nextCCWDir = false
-          data.ccwFace = e.rightFace
+          data.ccwFace = e.leftFace
           maxaz = azdif
         }
       }
     }
   })
+
+  if (!edge && edges.length > 0 && data.cwFace !== data.ccwFace) {
+    throw new Error(`Corrupted topology: adjacent edges ${data.nextCW} and ${data.nextCCW} bind different face (${data.cwFace} and ${data.ccwFace})`)
+  }
 
   return edges
 }
@@ -289,7 +294,7 @@ function addFaceSplit (topology, edge, dir, face, mbrOnly) {
 }
 
 function addEdge (topology, start, end, coordinates, modFace) {
-  const { edges, edgesTree } = topology
+  const { edges, edgesTree, faces } = topology
 
   const xs = coordinates.map(c => c[0])
   const ys = coordinates.map(c => c[1])
@@ -306,10 +311,10 @@ function addEdge (topology, start, end, coordinates, modFace) {
 
   edge.leftFace = undefined
   edge.rightFace = undefined
-  edge.nextLeft = edge
-  edge.nextLeftDir = true
-  edge.nextRight = edge
-  edge.nextRightDir = true
+  // edge.nextLeft = edge
+  // edge.nextLeftDir = true
+  // edge.nextRight = edge
+  // edge.nextRightDir = true
 
   const span = {
     cwFace: undefined,
@@ -331,9 +336,9 @@ function addEdge (topology, start, end, coordinates, modFace) {
       if (!edge.leftFace) {
         edge.leftFace = edge.rightFace = node.face
       } else if (edge.leftFace !== node.face) {
-        console.log(edge.leftFace)
-        console.log(node.face)
-        throw new SpatialError('geometry crosses an edge (endnodes in faces ...)')
+        const id1 = faces.indexOf[edge.leftFace]
+        const id2 = faces.indexOf[edge.leftFace]
+        throw new SpatialError(`geometry crosses an edge (endnodes in faces ${id1} and ${id2})`)
       }
     }
   })
@@ -349,15 +354,16 @@ function addEdge (topology, start, end, coordinates, modFace) {
   checkEdgeCrossing(topology, start, end, edge)
 
   const isClosed = start === end
-  const foundStart = findAdjacentEdges(topology, start, span, isClosed ? epan : null, -1)
+  const foundStart = findAdjacentEdges(topology, start, span, isClosed ? epan : undefined, undefined)
 
   let prevLeft
-  let prevLeftDir = true
+  let prevLeftDir
 
-  if (foundStart) {
+  if (foundStart.length > 0) {
     span.wasIsolated = false
     if (span.nextCW) {
       edge.nextRight = span.nextCW
+      edge.nextRightDir = span.nextCWDir
       prevLeft = span.nextCCW
       prevLeftDir = !span.nextCCWDir
     } else {
@@ -379,32 +385,37 @@ function addEdge (topology, start, end, coordinates, modFace) {
     prevLeftDir = isClosed
   }
 
-  const foundEnd = findAdjacentEdges(topology, start, span, isClosed ? epan : null, -1)
+  const foundEnd = findAdjacentEdges(topology, end, epan, isClosed ? span : undefined, undefined)
 
   let prevRight
-  let prevRightDir = true
+  let prevRightDir
 
-  if (foundEnd) {
+  if (foundEnd.length > 0) {
     epan.wasIsolated = false
     if (epan.nextCW) {
-      edge.nextRight = epan.nextCW
-      edge.nextRightDir = epan.nextCWDir
+      edge.nextLeft = epan.nextCW
+      edge.nextLeftDir = epan.nextCWDir
       prevRight = epan.nextCCW
+      prevRightDir = !epan.nextCCWDir
     } else {
-      edge.nextRight = edge
+      edge.nextLeft = edge
       prevRight = edge
       prevRightDir = false
     }
     if (!edge.rightFace) {
-      edge.rightFace = epan.cwFace
+      edge.rightFace = span.ccwFace
+    } else if (edge.rightFace !== epan.ccwFace) {
+      throw new Error('Side-location conflict')
     }
     if (!edge.leftFace) {
-      edge.leftFace = epan.ccwFace
+      edge.leftFace = span.cwFace
+    } else if (edge.leftFace !== epan.cwFace) {
+      throw new Error('Side-location conflict')
     }
   } else {
     span.wasIsolated = true
-    edge.nextRight = edge
-    edge.nextRightDir = isClosed
+    edge.nextLeft = edge
+    edge.nextLeftDir = isClosed
     prevRight = edge
     prevRightDir = !isClosed
   }
@@ -414,16 +425,20 @@ function addEdge (topology, start, end, coordinates, modFace) {
   if (prevLeft !== edge) {
     if (prevLeftDir) {
       prevLeft.nextLeft = edge
+      prevLeft.nextLeftDir = true
     } else {
       prevLeft.nextRight = edge
+      prevLeft.nextRightDir = true
     }
   }
 
   if (prevRight !== edge) {
     if (prevRightDir) {
       prevRight.nextLeft = edge
+      prevRight.nextLeftDir = false
     } else {
       prevRight.nextRight = edge
+      prevRight.nextRightDir = false
     }
   }
 

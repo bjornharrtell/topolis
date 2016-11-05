@@ -92,9 +92,9 @@ describe('edge', () => {
 
       expect(edge1.start).to.eql(node1)
       expect(edge1.end).to.eql(node2)
-      expect(edge1.nextLeft).to.eql(edge1)
+      expect(edge1.nextLeft).to.eql(edge2)
       expect(edge1.nextLeftDir).to.be(true)
-      expect(edge1.nextRight).to.eql(edge1)
+      expect(edge1.nextRight).to.eql(edge2)
       expect(edge1.nextRightDir).to.be(false)
       expect(edge1.leftFace).to.eql(universe)
       expect(edge1.rightFace).to.eql(newFace)
