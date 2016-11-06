@@ -85,6 +85,8 @@ function getEdgesByNode (topology, node) {
 }
 
 function findAdjacentEdges (topology, node, data, other, edge) {
+  const nid = topology.edges.indexOf(node)
+
   data.nextCW = data.nextCCW = undefined
   data.cwFace = data.ccwFace = undefined
 
@@ -97,24 +99,27 @@ function findAdjacentEdges (topology, node, data, other, edge) {
     console.debug(`Other edge end has cwFace=${topology.faces.indexOf(other.cwFace)} and ccwFace=${topology.faces.indexOf(other.ccwFace)}`)
   }
 
-  console.debug(`Looking for edges incident to node ${topology.nodes.indexOf(node)} and adjacent to azimuth ${data.az}`)
+  console.debug(`Looking for edges incident to node ${nid} and adjacent to azimuth ${data.az}`)
 
   const edges = getEdgesByNode(topology, node)
 
   console.debug(`getEdgeByNode returned ${edges.length} edges, minaz=${minaz}, maxaz=${maxaz}`)
 
   edges.forEach(e => {
+    const eid = topology.edges.indexOf(e)
+
     if (e === edge) {
       return
     }
 
     if (e.coordinates.length < 2) {
-      const id = topology.edges.indexOf[e]
-      throw new Error(`corrupted topology: edge ${id} does not have two distinct points`)
+      throw new Error(`corrupted topology: edge ${eid} does not have two distinct points`)
     }
 
     if (e.start === node) {
-      const az = azimuth(e.coordinates[0], e.coordinates[1])
+      const p1 = e.coordinates[0]
+      const p2 = e.coordinates[1]
+      const az = azimuth(p1, p2)
       azdif = az - data.az
       if (azdif < 0) azdif += 2 * Math.PI
       if (minaz === undefined) {
@@ -123,26 +128,28 @@ function findAdjacentEdges (topology, node, data, other, edge) {
         data.nextCWDir = data.nextCCWDir = true
         data.cwFace = e.leftFace
         data.ccwFace = e.rightFace
-        console.debug(`new nextCW and nextCCW edge is ${topology.edges.indexOf(e)}, outgoing, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (face_right is new ccwFace, face_left is new cwFace)`)
+        console.debug(`new nextCW and nextCCW edge is ${eid}, outgoing, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (face_right is new ccwFace, face_left is new cwFace)`)
       } else {
         if (azdif < minaz) {
           data.nextCW = e
           data.nextCWDir = true
           data.cwFace = e.leftFace
-          console.debug(`new nextCW edge is ${topology.edges.indexOf(e)}, outgoing, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (previous had minaz=${minaz}, face_left is new cwFace)`)
+          console.debug(`new nextCW edge is ${eid}, outgoing, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (previous had minaz=${minaz}, face_left is new cwFace)`)
           minaz = azdif
         } else if (azdif > maxaz) {
           data.nextCCW = e
           data.nextCCWDir = true
           data.ccwFace = e.rightFace
-          console.debug(`new nextCCW edge is ${topology.edges.indexOf(e)}, outgoing, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (previous had maxaz=${maxaz}, face_right is new ccwFace)`)
+          console.debug(`new nextCCW edge is ${eid}, outgoing, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (previous had maxaz=${maxaz}, face_right is new ccwFace)`)
           maxaz = azdif
         }
       }
     }
 
     if (e.end === node) {
-      const az = azimuth(e.coordinates[e.coordinates.length - 1], e.coordinates[e.coordinates.length - 2])
+      const p1 = e.coordinates[e.coordinates.length - 1]
+      const p2 = e.coordinates[e.coordinates.length - 2]
+      const az = azimuth(p1, p2)
       azdif = az - data.az
       if (azdif < 0) azdif += 2 * Math.PI
       if (minaz === undefined) {
@@ -151,19 +158,19 @@ function findAdjacentEdges (topology, node, data, other, edge) {
         data.nextCWDir = data.nextCCWDir = false
         data.cwFace = e.rightFace
         data.ccwFace = e.leftFace
-        console.debug(`new nextCW and nextCCW edge is ${topology.edges.indexOf(e)}, incoming, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (face_right is new cwFace, face_left is new ccwFace)`)
+        console.debug(`new nextCW and nextCCW edge is ${eid}, incoming, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (face_right is new cwFace, face_left is new ccwFace)`)
       } else {
         if (azdif < minaz) {
           data.nextCW = e
           data.nextCWDir = false
           data.cwFace = e.rightFace
-          console.debug(`new nextCW edge is ${topology.edges.indexOf(e)}, incoming, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (previous had minaz=${minaz}, face_right is new cwFace)`)
+          console.debug(`new nextCW edge is ${eid}, incoming, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (previous had minaz=${minaz}, face_right is new cwFace)`)
           minaz = azdif
         } else if (azdif > maxaz) {
           data.nextCCW = e
           data.nextCCWDir = false
           data.ccwFace = e.leftFace
-          console.debug(`new nextCCW edge is ${topology.edges.indexOf(e)}, outgoing, from start point, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (previous had maxaz=${maxaz}, face_left is new ccwFace)`)
+          console.debug(`new nextCCW edge is ${eid}, outgoing, from start point, with face_left ${topology.faces.indexOf(e.leftFace)} and face_right ${topology.faces.indexOf(e.rightFace)} (previous had maxaz=${maxaz}, face_left is new ccwFace)`)
           maxaz = azdif
         }
       }
