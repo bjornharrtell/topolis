@@ -32,15 +32,15 @@ export function azimuth (a, b) {
   if (a[0] === b[0]) {
     if (a[1] < b[1]) d = 0.0
     else if (a[1] > b[1]) d = Math.PI
-    else return 0
-    return 1
+    else throw new Error('same coordinate')
+    return d
   }
 
   if (a[1] === b[1]) {
     if (a[0] < b[0]) d = Math.PI / 2
     else if (a[0] > b[0]) d = Math.PI + (Math.PI / 2)
-    else return 0
-    return 1
+    else throw new Error('same coordinate')
+    return d
   }
 
   if (a[0] < b[0]) {

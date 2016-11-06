@@ -135,8 +135,8 @@ describe('edge', () => {
 
       expect(edge1.start).to.be(node1)
       expect(edge1.end).to.be(node2)
-      // expect(edge1.nextLeft).to.be(edge2) // is edge3 but should be edge2...
-      // expect(edge1.nextLeftDir).to.be(true) // is false but should be true
+      expect(edge1.nextLeft).to.be(edge2)
+      expect(edge1.nextLeftDir).to.be(true)
       expect(edge1.nextRight).to.be(edge3)
       expect(edge1.nextRightDir).to.be(true)
       expect(edge1.leftFace).to.be(universe)
@@ -146,17 +146,17 @@ describe('edge', () => {
       expect(edge2.end).to.be(node1)
       expect(edge2.nextLeft).to.be(edge1)
       expect(edge2.nextLeftDir).to.be(true)
-      // expect(edge2.nextRight).to.be(edge3) // is edge1 but should be edge 3
+      expect(edge2.nextRight).to.be(edge3)
       expect(edge2.nextRightDir).to.be(false)
       expect(edge2.leftFace).to.be(universe)
       // expect(edge2.rightFace).to.be(face1) // is universe but should be face1
 
       expect(edge3.start).to.be(node1)
       expect(edge3.end).to.be(node2)
-      expect(edge3.nextLeft).to.be(edge1) // is edge3 but should be edge2...
+      expect(edge3.nextLeft).to.be(edge1)
       expect(edge3.nextLeftDir).to.be(false)
-      //expect(edge3.nextRight).to.be(edge2) // is edge1 but should be edge 2
-      //expect(edge3.nextRightDir).to.be(false) // is true but should be false
+      expect(edge3.nextRight).to.be(edge2)
+      expect(edge3.nextRightDir).to.be(false)
       // expect(edge3.leftFace).to.be(face2) // is universe but should be face2
       // expect(edge3.rightFace).to.be(face1) // is universe but should be face1
 
