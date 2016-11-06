@@ -85,7 +85,7 @@ function getEdgesByNode (topology, node) {
 }
 
 function findAdjacentEdges (topology, node, data, other, edge) {
-  const nid = topology.edges.indexOf(node)
+  const nid = topology.nodes.indexOf(node)
 
   data.nextCW = data.nextCCW = undefined
   data.cwFace = data.ccwFace = undefined
@@ -192,7 +192,7 @@ function getRingEdges (topology, edge, dir, limit, foundEdges) {
   dir = dir ? edge.nextLeftDir : edge.nextRightDir
 
   if (!foundEdges.some(fe => fe.edge === edge && fe.dir === dir)) {
-    getRingEdges(topology, edge, dir, 0, foundEdges)
+    return getRingEdges(topology, edge, dir, 0, foundEdges)
   }
 
   return foundEdges
@@ -232,9 +232,24 @@ function getInteriorEdgePoint (coordinates) {
 }
 
 function addFaceSplit (topology, edge, dir, face, mbrOnly) {
+  const eid = topology.edges.indexOf(edge)
+  const fid = topology.faces.indexOf(face)
   const universe = topology.faces[0]
 
   const edges = getRingEdges(topology, edge, dir, 0)
+
+  if (edges.length === 0) {
+    throw new Error('no ring edges for edge')
+  }
+
+  console.debug(`getRingEdges returned ${edges.length} edges`)
+
+  if (edges.some(se => se.edge === edge && se.dir === !dir)) {
+    console.debug('not a ring')
+    return 0
+  }
+
+  console.debug(`Edge ${eid} split face ${fid} (mbr_only:${mbrOnly})`)
 
   const newFace = { }
 
@@ -242,10 +257,16 @@ function addFaceSplit (topology, edge, dir, face, mbrOnly) {
     .map(e => e.edge.coordinates)
     .reduce((a, b) => a.concat(b), [])
 
+  if (!dir) {
+    shell.reverse()
+  }
+
   const isccw = signedArea(shell) <= 0
+  console.debug(`Ring of edge ${eid} is ${isccw ? 'counter' : ''}clockwise`)
 
   if (face === universe) {
     if (!isccw) {
+      console.debug('The left face of this clockwise ring is the universe, will not create a new face there.')
       return -1
     }
   }
@@ -267,53 +288,70 @@ function addFaceSplit (topology, edge, dir, face, mbrOnly) {
 
   const newFaceIsOutside = face !== universe && !isccw
 
+  if (newFaceIsOutside) {
+    console.debug('New face is on the outside of the ring, updating rings in former shell')
+  } else {
+    console.debug('New face is on the inside of the ring, updating forward edges in new ring')
+  }
+
   const faceEdges = getEdgeByFace(topology, face, newFace)
   faceEdges.forEach(e => {
+    const eid = topology.edges.indexOf(e)
     let found = 0
-    edges.forEach(be => {
-      if (e === be.edge) {
-        if (be.dir) {
+    edges.forEach(se => {
+      if (e === se.edge) {
+        if (se.dir) {
           e.leftFace = newFace
         } else {
           e.rightFace = newFace
         }
         found++
         if (found === 2) {
-          return
+          return // TODO: should break, this is like continue...
         }
-      }
-      if (found > 0) {
-        return
-      }
-
-      const ep = getInteriorEdgePoint(edge.coordinates)
-      const contains = contains(ep, shell) !== 0
-
-      if (newFaceIsOutside) {
-        if (contains) {
-          return
-        }
-      } else {
-        if (!contains) {
-          return
-        }
-      }
-
-      if (e.leftFace === face) {
-        e.leftFace = newFace
-      }
-
-      if (e.rightFace === face) {
-        e.rightFace = newFace
       }
     })
+    if (found > 0) {
+      return
+    }
+
+    const ep = getInteriorEdgePoint(edge.coordinates)
+    const contains = contains(ep, shell) !== 0
+
+    if (newFaceIsOutside) {
+      if (contains) {
+        console.debug(`Edge ${eid} contained in an hole of the new face`)
+        return
+      }
+    } else {
+      if (!contains) {
+        console.debug(`Edge ${eid} not contained in the face shell`)
+        return
+      }
+    }
+
+    if (e.leftFace === face) {
+      console.debug(`Edge ${eid} has new face on the left side`)
+      e.leftFace = newFace
+    }
+
+    if (e.rightFace === face) {
+      console.debug(`Edge ${eid} has new face on the right side`)
+      e.rightFace = newFace
+    }
   })
 
-  return 0
+  // TODO: update iso nodes
+
+  return newFace
 }
 
 function addEdge (topology, start, end, coordinates, modFace) {
   const { edges, edgesTree, faces } = topology
+
+  if (!isSimple(coordinates)) {
+    throw new SpatialError('curve not simple')
+  }
 
   const xs = coordinates.map(c => c[0])
   const ys = coordinates.map(c => c[1])
@@ -322,14 +360,16 @@ function addEdge (topology, start, end, coordinates, modFace) {
     start,
     end,
     coordinates,
+    leftFace: undefined,
+    rightFace: undefined,
     minX: Math.min(...xs),
     minY: Math.min(...ys),
     maxX: Math.max(...xs),
     maxY: Math.max(...ys)
   }
 
-  edge.leftFace = undefined
-  edge.rightFace = undefined
+  // TODO: remove repeated points
+  // TODO: check that we haave at least two points left
 
   const span = {
     cwFace: undefined,
@@ -350,8 +390,8 @@ function addEdge (topology, start, end, coordinates, modFace) {
       if (!edge.leftFace) {
         edge.leftFace = edge.rightFace = node.face
       } else if (edge.leftFace !== node.face) {
-        const id1 = faces.indexOf[edge.leftFace]
-        const id2 = faces.indexOf[node.face]
+        const id1 = faces.indexOf(edge.leftFace)
+        const id2 = faces.indexOf(node.face)
         throw new SpatialError(`geometry crosses an edge (endnodes in faces ${id1} and ${id2})`)
       }
     }
@@ -480,13 +520,13 @@ function addEdge (topology, start, end, coordinates, modFace) {
   let newface1
 
   if (!modFace) {
-    newface1 = addFaceSplit(topology, edge, edge.leftFace, edge.leftFaceDir, 0)
+    newface1 = addFaceSplit(topology, edge, false, edge.leftFace, 0)
     if (newface1 === 0) {
       return edge
     }
   }
 
-  let newface = addFaceSplit(topology, edge, edge.leftFace, edge.leftFaceDir, 0)
+  let newface = addFaceSplit(topology, edge, true, edge.leftFace, 0)
 
   if (modFace) {
     if (newface === 0) {
@@ -494,12 +534,12 @@ function addEdge (topology, start, end, coordinates, modFace) {
     }
 
     if (newface < 0) {
-      newface = addFaceSplit(topology, edge, edge.leftFace, edge.leftFaceDir, 0)
+      newface = addFaceSplit(topology, edge, false, edge.leftFace, 0)
       if (newface === 0) {
         return edge
       }
     } else {
-      addFaceSplit(topology, edge, edge.leftFace, 1)
+      addFaceSplit(topology, edge, false, edge.leftFace, 1)
     }
   }
 
