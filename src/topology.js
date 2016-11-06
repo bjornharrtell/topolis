@@ -1,9 +1,9 @@
 import rbush from 'rbush'
 
 export function create (name, srid, tolerance) {
-  const nodes = []
+  const nodes = [{}]
   const nodesTree = rbush(16)
-  const edges = []
+  const edges = [{}]
   const edgesTree = rbush(16)
   const faces = [{}]
   const facesTree = rbush(16)
