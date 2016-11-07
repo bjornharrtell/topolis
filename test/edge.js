@@ -170,6 +170,19 @@ describe('edge', () => {
       select st_addedgenewfaces('topo5', 2, 1, ST_GeomFromText('LINESTRING(1 1, 1 0, 0 0)'));
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 1 1)'));
       */
+
+      // third lwt_AddEdgeNewFaces
+      /*
+      edge 1 starts on node 1, edgeend is 0,0-0,1
+      azimuth of edge 1: 0 (diff: -0.785398)
+      new nextCW and nextCCW edge is 1, outgoing, with face_left 0 and face_right 1 (face_right is new ccwFace, face_left is new cwFace)
+      */
+      // third call in js version.. face_right is 2 but should be 1
+      /*
+      edge 1 starts on node 1, edgeend is 0,0-0,1
+      azimuth of edge 1: 0 (diff: -0.7853981633974483)
+      new nextCW and nextCCW edge is 1, outgoing, with face_left 0 and face_right 2 (face_right is new ccwFace, face_left is new cwFace)
+      */
     })
   })
 })

@@ -7,6 +7,7 @@ export function addIsoNode (topology, coordinate) {
   const face = faces[0]
 
   const node = {
+    id: nodes.length + 1,
     face,
     coordinate,
     equals (other) {

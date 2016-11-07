@@ -1,6 +1,7 @@
 import { calcWindingNumber } from './utils'
 
 function getNodeByFace (topology, face) {
+  // TODO: only within face mbr
   return topology.nodes.filter(n => n.face === face)
 }
 
@@ -52,37 +53,40 @@ function getInteriorEdgePoint (coordinates) {
 }
 
 export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
-  const eid = topology.edges.indexOf(edge)
-  const fid = topology.faces.indexOf(face)
+  const faces = topology.faces
   const universe = topology.faces[0]
 
-  const edges = getRingEdges(topology, edge, dir, 0)
+  const sedges = getRingEdges(topology, edge, dir, 0)
 
-  if (edges.length === 0) {
-    throw new Error('no ring edges for edge')
+  if (sedges.length === 0) {
+    throw new Error('no ring edges for edge' + edge.id)
   }
 
-  console.debug(`getRingEdges returned ${edges.length} edges`)
+  console.debug(`getRingEdges returned ${sedges.length} edges`)
 
-  if (edges.some(se => se.edge === edge && se.dir === !dir)) {
+  if (sedges.some(se => se.edge === edge && se.dir === !dir)) {
     console.debug('not a ring')
     return 0
   }
 
-  console.debug(`Edge ${eid} (${dir}) split face ${fid} (mbr_only:${mbrOnly})`)
+  console.debug(`Edge ${edge.id} (${dir}) split face ${face.id} (mbr_only:${mbrOnly})`)
 
-  const newFace = { }
-
-  const shell = edges
-    .map(e => e.edge.coordinates)
-    .reduce((a, b) => a.concat(b), [])
-
-  if (!dir) {
-    shell.reverse()
+  const newFace = {
+    id: faces.length + 1
   }
 
+  // const ringEdges = sedges.map(se => se.edge).filter((elem, pos, arr) => arr.indexOf(elem) === pos)
+
+  sedges.forEach((e, i) => {
+    console.log(`Edge ${i} in ring of edge ${edge.id} (${dir}) is edge ${e.edge.id} (${e.dir})`)
+  })
+
+  const shell = sedges
+    .map(e => e.dir ? e.edge.coordinates : e.edge.coordinates.slice().reverse())
+    .reduce((a, b) => a.concat(b), [])
+
   const isccw = signedArea(shell) <= 0
-  console.debug(`Ring of edge ${eid} is ${isccw ? 'counter' : ''}clockwise`)
+  console.debug(`Ring of edge ${edge.id} is ${isccw ? 'counter' : ''}clockwise`)
 
   if (face === universe) {
     if (!isccw) {
@@ -116,13 +120,14 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
 
   const faceEdges = getEdgeByFace(topology, face, newFace)
   faceEdges.forEach(e => {
-    const eid = topology.edges.indexOf(e)
     let found = 0
-    edges.every(se => {
+    sedges.every(se => {
       if (e === se.edge) {
         if (se.dir) {
+          console.debug(`Edge ${e.id} is a forward edge of the new ring`)
           e.leftFace = newFace
         } else {
+          console.debug(`Edge ${e.id} is a backward edge of the new ring`)
           e.rightFace = newFace
         }
         found++
@@ -141,23 +146,23 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
 
     if (newFaceIsOutside) {
       if (contains) {
-        console.debug(`Edge ${eid} contained in an hole of the new face`)
+        console.debug(`Edge ${e.id} contained in an hole of the new face`)
         return
       }
     } else {
       if (!contains) {
-        console.debug(`Edge ${eid} not contained in the face shell`)
+        console.debug(`Edge ${e.id} not contained in the face shell`)
         return
       }
     }
 
     if (e.leftFace === face) {
-      console.debug(`Edge ${eid} has new face on the left side`)
+      console.debug(`Edge ${e.id} has new face on the left side`)
       e.leftFace = newFace
     }
 
     if (e.rightFace === face) {
-      console.debug(`Edge ${eid} has new face on the right side`)
+      console.debug(`Edge ${e.id} has new face on the right side`)
       e.rightFace = newFace
     }
   })
@@ -165,17 +170,16 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
   const nodes = getNodeByFace(topology, face)
 
   nodes.forEach(n => {
-    const nid = topology.nodes.indexOf(n)
     const contains = calcWindingNumber(n.coordinate, shell) !== 0
-    console.debug(`Node ${nid} is ${contains ? '' : 'not '}contained in new ring, newface is ${newFaceIsOutside ? 'outside' : 'inside'}`)
+    console.debug(`Node ${n.id} is ${contains ? '' : 'not '}contained in new ring, newface is ${newFaceIsOutside ? 'outside' : 'inside'}`)
     if (newFaceIsOutside) {
       if (contains) {
-        console.debug(`Node ${nid} contained in an hole of the new face`)
+        console.debug(`Node ${n.id} contained in an hole of the new face`)
         return
       }
     } else {
       if (!contains) {
-        console.debug(`Node ${nid} contained in the face shell`)
+        console.debug(`Node ${n.id} contained in the face shell`)
         return
       }
     }
