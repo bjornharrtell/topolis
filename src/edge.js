@@ -3,7 +3,17 @@ import { isSimple, relate, equals, azimuth } from './utils'
 import { addFaceSplit } from './face'
 
 console.debug = console.log
-// console.debug = function () {}
+console.debug = function () {}
+
+export function sid (e, d) {
+  return d ? e.id : -e.id
+}
+
+export function e2s (e) {
+  const nl = sid(e, e.nextLeftDir)
+  const nr = sid(e, e.nextRightDir)
+  return `ID: ${e.id} NL: ${nl} NR: ${nr} LF: ${e.leftFace.id} RF: ${e.rightFace.id}`
+}
 
 export function addIsoEdge (topology, start, end, coordinates) {
   const { edges, edgesTree } = topology
@@ -180,10 +190,10 @@ function findAdjacentEdges (topology, node, data, other, edge) {
     }
   })
 
-  console.debug(`edges adjacent to azimuth ${data.az} (incident to node ${node.id}): CW:${data.nextCW.id} (${data.nextCWDir} ${minaz}) CCW:${data.nextCCW.id} (${data.nextCCWDir} ${maxaz})`)
+  console.debug(`edges adjacent to azimuth ${data.az} (incident to node ${node.id}): CW:${sid(data.nextCW, data.nextCWDir)} (${minaz}) CCW:${sid(data.nextCCW, data.nextCCWDir)} (${maxaz})`)
 
   if (!edge && edges.length > 0 && data.cwFace !== data.ccwFace) {
-    throw new Error(`Corrupted topology: adjacent edges ${data.nextCW} and ${data.nextCCW} bind different face (${data.cwFace} and ${data.ccwFace})`)
+    throw new Error(`Corrupted topology: adjacent edges ${data.nextCW.id} and ${data.nextCCW.id} bind different face (${data.cwFace} and ${data.ccwFace})`)
   }
 
   return edges
@@ -271,10 +281,12 @@ function addEdge (topology, start, end, coordinates, modFace) {
       prevLeft = edge
       prevLeftDir = true
     }
-    console.debug(`New edge is connected on start node, next_right is ${edge.nextRight.id} (${edge.nextRightDir}), prev_left is ${prevLeft.id} (${prevLeftDir})`)
+    console.debug(`New edge is connected on start node, next_right is ${sid(edge.nextRight, edge.nextRightDir)}, prev_left is ${sid(prevLeft, prevLeftDir)}`)
+    console.log('Edge: ' + e2s(edge))
     if (edge.rightFace.id === -1) {
       edge.rightFace = span.cwFace
     }
+    console.log('Edge: ' + e2s(edge))
     if (!edge.leftFace.id === -1) {
       edge.leftFace = span.ccwFace
     }
@@ -284,7 +296,7 @@ function addEdge (topology, start, end, coordinates, modFace) {
     edge.nextRightDir = !isClosed
     prevLeft = edge
     prevLeftDir = isClosed
-    console.debug(`New edge is isolated on start node, next_right is ${edge.nextRight.id} (${edge.nextRightDir}), prev_left is ${prevLeft.id} (${prevLeftDir})`)
+    console.debug(`New edge is isolated on start node, next_right is ${sid(edge.nextRight, edge.nextRightDir)}, prev_left is ${sid(prevLeft, prevLeftDir)}`)
   }
 
   const foundEnd = findAdjacentEdges(topology, end, epan, isClosed ? span : undefined, undefined)
@@ -308,12 +320,14 @@ function addEdge (topology, start, end, coordinates, modFace) {
       prevRight = edge
       prevRightDir = false
     }
-    console.debug(`New edge is connected on end node, next_left is ${edge.nextLeft.id} (${edge.nextLeftDir}), prev_right is ${prevRight.id} (${prevRightDir})`)
+    console.debug(`New edge is connected on end node, next_left is ${sid(edge.nextLeft, edge.nextLeftDir)}, prev_right is ${sid(prevRight, prevRightDir)}`)
+    console.log('Edge: ' + e2s(edge))
     if (edge.rightFace.id === -1) {
       edge.rightFace = span.ccwFace
     } else if (edge.rightFace !== epan.ccwFace) {
       throw new Error(`Side-location conflict: new edge starts in face ${edge.rightFace.id} and ends in face ${epan.ccwFace.id}`)
     }
+    console.log('Edge: ' + e2s(edge))
     if (edge.leftFace.id === -1) {
       edge.leftFace = span.cwFace
     } else if (edge.leftFace !== epan.cwFace) {
@@ -325,7 +339,7 @@ function addEdge (topology, start, end, coordinates, modFace) {
     edge.nextLeftDir = isClosed
     prevRight = edge
     prevRightDir = !isClosed
-    console.debug(`New edge is isolated on end node, next_left is ${edge.nextLeft.id} (${edge.nextLeftDir}), prev_right is ${prevRight.id} (${prevRightDir})`)
+    console.debug(`New edge is isolated on end node, next_left is ${sid(edge.nextLeft, edge.nextLeftDir)}, prev_right is ${sid(prevRight, prevRightDir)}`)
   }
 
   if (edge.leftFace !== edge.rightFace) {

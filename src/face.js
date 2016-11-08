@@ -1,4 +1,5 @@
 import { calcWindingNumber } from './utils'
+import { sid } from './edge'
 
 function getNodeByFace (topology, face) {
   // TODO: only within face mbr
@@ -69,7 +70,7 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
     return 0
   }
 
-  console.debug(`Edge ${edge.id} (${dir}) split face ${face.id} (mbr_only:${mbrOnly})`)
+  console.debug(`Edge ${edge.id} split face ${face.id} (mbr_only:${mbrOnly})`)
 
   const newFace = {
     id: faces.length + 1
@@ -78,7 +79,7 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
   // const ringEdges = sedges.map(se => se.edge).filter((elem, pos, arr) => arr.indexOf(elem) === pos)
 
   sedges.forEach((e, i) => {
-    console.log(`Edge ${i} in ring of edge ${edge.id} (${dir}) is edge ${e.edge.id} (${e.dir})`)
+    console.debug(`Edge ${i} in ring of edge ${sid(edge, dir)} is edge ${sid(e.edge, e.dir)}`)
   })
 
   const shell = sedges
