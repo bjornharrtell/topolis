@@ -3,7 +3,7 @@ import { isSimple, relate, equals, azimuth } from './utils'
 import { addFaceSplit } from './face'
 
 console.debug = console.log
-// console.debug = function () {}
+console.debug = function () {}
 
 export function sid (e, d) {
   return d ? e.id : -e.id
@@ -204,6 +204,8 @@ function findAdjacentEdges (topology, node, data, other, edge) {
 }
 
 function addEdge (topology, start, end, coordinates, modFace) {
+  console.debug('addEdge called')
+
   const { edges, edgesTree } = topology
 
   if (!isSimple(coordinates)) {
@@ -288,11 +290,9 @@ function addEdge (topology, start, end, coordinates, modFace) {
       prevLeftDir = true
     }
     console.debug(`New edge is connected on start node, next_right is ${sid(edge.nextRight, edge.nextRightDir)}, prev_left is ${sid(prevLeft, prevLeftDir)}`)
-    console.log('Edge: ' + e2s(edge))
     if (edge.rightFace.id === -1) {
       edge.rightFace = span.cwFace
     }
-    console.log('Edge: ' + e2s(edge))
     if (!edge.leftFace.id === -1) {
       edge.leftFace = span.ccwFace
     }
@@ -326,21 +326,19 @@ function addEdge (topology, start, end, coordinates, modFace) {
       prevRight = edge
       prevRightDir = false
     }
-    console.debug(`New edge is connected on end node, next_left is ${sid(edge.nextLeft, edge.nextLeftDir)}, prev_right is ${sid(prevRight, prevRightDir)}`)
-    console.log('Edge: ' + e2s(edge))
+    console.debug(`New edge ${edge.id} is connected on end node, next_left is ${sid(edge.nextLeft, edge.nextLeftDir)}, prev_right is ${sid(prevRight, prevRightDir)}`)
     if (edge.rightFace.id === -1) {
       edge.rightFace = span.ccwFace
     } else if (edge.rightFace !== epan.ccwFace) {
       throw new Error(`Side-location conflict: new edge starts in face ${edge.rightFace.id} and ends in face ${epan.ccwFace.id}`)
     }
-    console.log('Edge: ' + e2s(edge))
     if (edge.leftFace.id === -1) {
       edge.leftFace = span.cwFace
     } else if (edge.leftFace !== epan.cwFace) {
       throw new Error(`Side-location conflict: new edge starts in face ${edge.leftFace.id} and ends in face ${epan.cwFace.id}`)
     }
   } else {
-    span.wasIsolated = true
+    epan.wasIsolated = true
     edge.nextLeft = edge
     edge.nextLeftDir = isClosed
     prevRight = edge

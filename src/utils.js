@@ -11,6 +11,14 @@ function toLineString (coordinates) {
   return factory.createLineString(coordinates.map(c => new Coordinate(c[0], c[1])))
 }
 
+function toPoint (c) {
+  return factory.createPoint(new Coordinate(c[0], c[1]))
+}
+
+function toPolygon (coordinates) {
+  return factory.createPolygon(coordinates.map(c => new Coordinate(c[0], c[1])))
+}
+
 export function isSimple (coordinates) {
   const lineString = toLineString(coordinates)
   return isSimpleOp.isSimpleLinearGeometry(lineString)
@@ -62,6 +70,13 @@ export function azimuth (a, b) {
 
 function isLeft (c0, c1, c2) {
   return ((c1[0] - c0[0]) * (c2[1] - c0[1])) - ((c2[0] - c0[0]) * (c1[1] - c0[1]))
+}
+
+export function pointInPoly (c, shell) {
+  const point = toPoint(c)
+  const polygon = toPolygon(shell)
+  console.log(polygon.shell.points.coordinates)
+  return RelateOp.contains(polygon, point)
 }
 
 export function calcWindingNumber (c, shell) {

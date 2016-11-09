@@ -1,5 +1,5 @@
 import { calcWindingNumber } from './utils'
-import { sid } from './edge'
+import { sid, e2s } from './edge'
 
 function getNodeByFace (topology, face) {
   // TODO: only within face mbr
@@ -10,11 +10,11 @@ function getRingEdges (topology, edge, dir, limit, foundEdges) {
   foundEdges = foundEdges || []
   foundEdges.push({ edge, dir })
 
-  edge = dir ? edge.nextLeft : edge.nextRight
-  dir = dir ? edge.nextLeftDir : edge.nextRightDir
+  const nextDir = dir ? edge.nextLeftDir : edge.nextRightDir
+  const nextEdge = dir ? edge.nextLeft : edge.nextRight
 
-  if (!foundEdges.some(fe => fe.edge === edge && fe.dir === dir)) {
-    return getRingEdges(topology, edge, dir, 0, foundEdges)
+  if (!foundEdges.some(fe => fe.edge === nextEdge && fe.dir === nextDir)) {
+    return getRingEdges(topology, nextEdge, nextDir, 0, foundEdges)
   }
 
   return foundEdges
@@ -59,6 +59,8 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
 
   const sedges = getRingEdges(topology, edge, dir, 0)
 
+  sedges.forEach((se, i) => console.debug(`Component ${i} in ring of edge ${edge.id} is edge ${sid(se.edge, se.dir)}`))
+
   if (sedges.length === 0) {
     throw new Error('no ring edges for edge' + edge.id)
   }
@@ -70,7 +72,7 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
     return 0
   }
 
-  console.debug(`Edge ${edge.id} split face ${face.id} (mbr_only:${mbrOnly})`)
+  console.debug(`Edge ${sid(edge, dir)} split face ${face.id} (mbr_only:${mbrOnly})`)
 
   const newFace = {
     id: faces.length
@@ -78,8 +80,8 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
 
   // const ringEdges = sedges.map(se => se.edge).filter((elem, pos, arr) => arr.indexOf(elem) === pos)
 
-  sedges.forEach((e, i) => {
-    console.debug(`Edge ${i} in ring of edge ${sid(edge, dir)} is edge ${sid(e.edge, e.dir)}`)
+  sedges.forEach((se, i) => {
+    console.debug(`Edge ${i} in ring of edge ${sid(edge, dir)} is edge ${sid(se.edge, se.dir)}`)
   })
 
   const shell = sedges
@@ -120,6 +122,9 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
   }
 
   const faceEdges = getEdgeByFace(topology, face, newFace)
+
+  console.debug(`getEdgeByFace returned ${faceEdges.length} edges`)
+
   faceEdges.forEach(e => {
     let found = 0
     sedges.every(se => {

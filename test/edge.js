@@ -90,10 +90,7 @@ describe('edge', () => {
       const node1 = addIsoNode(topology, [0, 0])
       const node2 = addIsoNode(topology, [1, 1])
       const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]])
-      console.log('New Edge: ' + e2s(edge1))
       const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]])
-      console.log('New Edge: ' + e2s(edge1))
-      console.log('New Edge: ' + e2s(edge2))
 
       const universe = topology.faces[0]
       const newFace = topology.faces[1]
@@ -130,18 +127,12 @@ describe('edge', () => {
       const node1 = addIsoNode(topology, [0, 0])
       const node2 = addIsoNode(topology, [1, 1])
       const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]])
-      console.log('New Edge: ' + e2s(edge1))
       const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]])
-      console.log('New Edge: ' + e2s(edge1))
-      console.log('New Edge: ' + e2s(edge2))
       const edge3 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [1, 1]])
-      console.log('New Edge: ' + e2s(edge1))
-      console.log('New Edge: ' + e2s(edge2))
-      console.log('New Edge: ' + e2s(edge3))
 
       const universe = topology.faces[0]
-      const face1 = topology.faces[1]
       const face2 = topology.faces[2]
+      const face3 = topology.faces[3]
 
       expect(edge1.start).to.be(node1)
       expect(edge1.end).to.be(node2)
@@ -150,7 +141,7 @@ describe('edge', () => {
       expect(edge1.nextRight).to.be(edge3)
       expect(edge1.nextRightDir).to.be(true)
       expect(edge1.leftFace).to.be(universe)
-      // expect(edge1.rightFace).to.be(face2) // should be face2 but is face1
+      expect(edge1.rightFace).to.be(face3)
 
       expect(edge2.start).to.be(node2)
       expect(edge2.end).to.be(node1)
@@ -159,7 +150,7 @@ describe('edge', () => {
       expect(edge2.nextRight).to.be(edge3)
       expect(edge2.nextRightDir).to.be(false)
       expect(edge2.leftFace).to.be(universe)
-      // expect(edge2.rightFace).to.be(face1) // should be face1 but is face2
+      expect(edge2.rightFace).to.be(face2)
 
       expect(edge3.start).to.be(node1)
       expect(edge3.end).to.be(node2)
@@ -167,8 +158,8 @@ describe('edge', () => {
       expect(edge3.nextLeftDir).to.be(false)
       expect(edge3.nextRight).to.be(edge2)
       expect(edge3.nextRightDir).to.be(false)
-      // expect(edge3.leftFace).to.be(face2) // should be face2 but is universe
-      // expect(edge3.rightFace).to.be(face1) // should be face1 but is face2
+      expect(edge3.leftFace).to.be(face3)
+      expect(edge3.rightFace).to.be(face2)
 
       /* equivalent postgis topo
       select droptopology('topo5');
@@ -178,19 +169,6 @@ describe('edge', () => {
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
       select st_addedgenewfaces('topo5', 2, 1, ST_GeomFromText('LINESTRING(1 1, 1 0, 0 0)'));
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 1 1)'));
-      */
-
-      // third lwt_AddEdgeNewFaces
-      /*
-      edge 1 starts on node 1, edgeend is 0,0-0,1
-      azimuth of edge 1: 0 (diff: -0.785398)
-      new nextCW and nextCCW edge is 1, outgoing, with face_left 0 and face_right 1 (face_right is new ccwFace, face_left is new cwFace)
-      */
-      // third call in js version.. face_right is 2 but should be 1
-      /*
-      edge 1 starts on node 1, edgeend is 0,0-0,1
-      azimuth of edge 1: 0 (diff: -0.7853981633974483)
-      new nextCW and nextCCW edge is 1, outgoing, with face_left 0 and face_right 2 (face_right is new ccwFace, face_left is new cwFace)
       */
     })
   })
