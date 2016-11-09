@@ -73,7 +73,7 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
   console.debug(`Edge ${edge.id} split face ${face.id} (mbr_only:${mbrOnly})`)
 
   const newFace = {
-    id: faces.length + 1
+    id: faces.length
   }
 
   // const ringEdges = sedges.map(se => se.edge).filter((elem, pos, arr) => arr.indexOf(elem) === pos)

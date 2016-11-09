@@ -90,7 +90,10 @@ describe('edge', () => {
       const node1 = addIsoNode(topology, [0, 0])
       const node2 = addIsoNode(topology, [1, 1])
       const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]])
+      console.log('New Edge: ' + e2s(edge1))
       const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]])
+      console.log('New Edge: ' + e2s(edge1))
+      console.log('New Edge: ' + e2s(edge2))
 
       const universe = topology.faces[0]
       const newFace = topology.faces[1]
@@ -129,8 +132,11 @@ describe('edge', () => {
       const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]])
       console.log('New Edge: ' + e2s(edge1))
       const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]])
+      console.log('New Edge: ' + e2s(edge1))
       console.log('New Edge: ' + e2s(edge2))
       const edge3 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [1, 1]])
+      console.log('New Edge: ' + e2s(edge1))
+      console.log('New Edge: ' + e2s(edge2))
       console.log('New Edge: ' + e2s(edge3))
 
       const universe = topology.faces[0]

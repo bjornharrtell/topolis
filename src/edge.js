@@ -3,15 +3,15 @@ import { isSimple, relate, equals, azimuth } from './utils'
 import { addFaceSplit } from './face'
 
 console.debug = console.log
-console.debug = function () {}
+// console.debug = function () {}
 
 export function sid (e, d) {
   return d ? e.id : -e.id
 }
 
 export function e2s (e) {
-  const nl = sid(e, e.nextLeftDir)
-  const nr = sid(e, e.nextRightDir)
+  const nl = sid(e.nextLeft, e.nextLeftDir)
+  const nr = sid(e.nextRight, e.nextRightDir)
   return `ID: ${e.id} NL: ${nl} NR: ${nr} LF: ${e.leftFace.id} RF: ${e.rightFace.id}`
 }
 
@@ -26,6 +26,10 @@ export function addIsoEdge (topology, start, end, coordinates) {
     start,
     end,
     coordinates,
+    nextLeft: { id: 0 },
+    nextRight: { id: 0 },
+    leftFace: { id: -1 },
+    rightFace: { id: -1 },
     minX: Math.min(...xs),
     minY: Math.min(...ys),
     maxX: Math.max(...xs),
@@ -214,6 +218,8 @@ function addEdge (topology, start, end, coordinates, modFace) {
     start,
     end,
     coordinates,
+    nextLeft: { id: 0 },
+    nextRight: { id: 0 },
     leftFace: { id: -1 },
     rightFace: { id: -1 },
     minX: Math.min(...xs),
