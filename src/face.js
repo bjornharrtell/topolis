@@ -1,12 +1,12 @@
 import { calcWindingNumber } from './utils'
 import { sid, e2s } from './edge'
 
-function getNodeByFace (topology, face) {
+function getNodeByFace (topo, face) {
   // TODO: only within face mbr
-  return topology.nodes.filter(n => n.face === face)
+  return topo.nodes.filter(n => n.face === face)
 }
 
-function getRingEdges (topology, edge, dir, limit, foundEdges) {
+function getRingEdges (topo, edge, dir, limit, foundEdges) {
   foundEdges = foundEdges || []
   foundEdges.push({ edge, dir })
 
@@ -14,14 +14,14 @@ function getRingEdges (topology, edge, dir, limit, foundEdges) {
   const nextEdge = dir ? edge.nextLeft : edge.nextRight
 
   if (!foundEdges.some(fe => fe.edge === nextEdge && fe.dir === nextDir)) {
-    return getRingEdges(topology, nextEdge, nextDir, 0, foundEdges)
+    return getRingEdges(topo, nextEdge, nextDir, 0, foundEdges)
   }
 
   return foundEdges
 }
 
-function getEdgeByFace (topology, face, mbr) {
-  return topology.edges.filter(e => e.leftFace === face || e.rightFace === face)
+function getEdgeByFace (topo, face, mbr) {
+  return topo.edges.filter(e => e.leftFace === face || e.rightFace === face)
   // TODO: include within mbr
 }
 
@@ -53,11 +53,11 @@ function getInteriorEdgePoint (coordinates) {
   return coordinates[1]
 }
 
-export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
-  const faces = topology.faces
-  const universe = topology.faces[0]
+export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
+  const faces = topo.faces
+  const universe = topo.faces[0]
 
-  const sedges = getRingEdges(topology, edge, dir, 0)
+  const sedges = getRingEdges(topo, edge, dir, 0)
 
   sedges.forEach((se, i) => console.debug(`Component ${i} in ring of edge ${edge.id} is edge ${sid(se.edge, se.dir)}`))
 
@@ -111,7 +111,7 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
     // TODO: newFace mbr shuld be shellbox
   }
 
-  topology.faces.push(newFace)
+  topo.faces.push(newFace)
 
   const newFaceIsOutside = face !== universe && !isccw
 
@@ -121,7 +121,7 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
     console.debug('New face is on the inside of the ring, updating forward edges in new ring')
   }
 
-  const faceEdges = getEdgeByFace(topology, face, newFace)
+  const faceEdges = getEdgeByFace(topo, face, newFace)
 
   console.debug(`getEdgeByFace returned ${faceEdges.length} edges`)
 
@@ -173,7 +173,7 @@ export function addFaceSplit (topology, edge, dir, face, mbrOnly) {
     }
   })
 
-  const nodes = getNodeByFace(topology, face)
+  const nodes = getNodeByFace(topo, face)
 
   nodes.forEach(n => {
     const contains = calcWindingNumber(n.coordinate, shell) !== 0

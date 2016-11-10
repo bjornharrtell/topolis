@@ -1,6 +1,6 @@
 import expect from 'expect.js'
 
-import { create as createTopology } from '../src/topology'
+import { create as createTopology } from '../src/topo'
 import { addIsoNode } from '../src/node'
 
 let topology

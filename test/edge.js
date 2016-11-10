@@ -1,14 +1,14 @@
 import expect from 'expect.js'
 
-import { create as createTopology } from '../src/topology'
+import { create as createTopology } from '../src/topo'
 import { addIsoNode } from '../src/node'
-import { addIsoEdge, addEdgeNewFaces, e2s } from '../src/edge'
+import { addIsoEdge, addEdgeNewFaces } from '../src/edge'
 
 let topology
 
-function unit() {
-
-}
+/*
+function unit() { }
+*/
 
 beforeEach(() => {
   topology = createTopology('test', 0, 0)

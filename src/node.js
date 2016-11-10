@@ -1,7 +1,7 @@
 import SpatialError from './SpatialError'
 
-export function addIsoNode (topology, coordinate) {
-  const { nodes, nodesTree: tree, faces } = topology
+export function addIsoNode (topo, coordinate) {
+  const { nodes, nodesTree: tree, faces } = topo
 
   // TODO: determine true face
   const face = faces[0]

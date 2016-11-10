@@ -7,7 +7,7 @@ export function create (name, srid, tolerance) {
   const edgesTree = rbush(16)
   const faces = [{ id: 0 }]
   const facesTree = rbush(16)
-  const topology = {
+  const topo = {
     name,
     srid,
     tolerance,
@@ -18,5 +18,5 @@ export function create (name, srid, tolerance) {
     faces,
     facesTree
   }
-  return topology
+  return topo
 }

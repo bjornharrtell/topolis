@@ -15,8 +15,8 @@ export function e2s (e) {
   return `ID: ${e.id} NL: ${nl} NR: ${nr} LF: ${e.leftFace.id} RF: ${e.rightFace.id}`
 }
 
-export function addIsoEdge (topology, start, end, coordinates) {
-  const { edges, edgesTree } = topology
+export function addIsoEdge (topo, start, end, coordinates) {
+  const { edges, edgesTree } = topo
 
   const xs = coordinates.map(c => c[0])
   const ys = coordinates.map(c => c[1])
@@ -60,7 +60,7 @@ export function addIsoEdge (topology, start, end, coordinates) {
     throw new SpatialError('curve not simple')
   }
 
-  checkEdgeCrossing(topology, start, end, edge)
+  checkEdgeCrossing(topo, start, end, edge)
 
   edge.leftFace = end.face
   edge.nextLeft = edge
@@ -76,7 +76,7 @@ export function addIsoEdge (topology, start, end, coordinates) {
   return edge
 }
 
-function checkEdgeCrossing (topology, start, end, edge) {
+function checkEdgeCrossing (topo, start, end, edge) {
   const check = (e1, e2) => {
     if (e1 === e2) {
       return
@@ -92,14 +92,14 @@ function checkEdgeCrossing (topology, start, end, edge) {
       throw new SpatialError('geometry crosses edge ' + e1.id)
     }
   }
-  topology.edgesTree.search(edge).forEach(e => check(e, edge))
+  topo.edgesTree.search(edge).forEach(e => check(e, edge))
 }
 
-function getEdgesByNode (topology, node) {
-  return topology.edges.filter(e => e.start === node || e.end === node)
+function getEdgesByNode (topo, node) {
+  return topo.edges.filter(e => e.start === node || e.end === node)
 }
 
-function findAdjacentEdges (topology, node, data, other, edge) {
+function findAdjacentEdges (topo, node, data, other, edge) {
   data.nextCW = data.nextCCW = { id: 0 }
   data.cwFace = data.ccwFace = { id: -1 }
 
@@ -116,7 +116,7 @@ function findAdjacentEdges (topology, node, data, other, edge) {
 
   console.debug(`Looking for edges incident to node ${node.id} and adjacent to azimuth ${data.az}`)
 
-  const edges = getEdgesByNode(topology, node)
+  const edges = getEdgesByNode(topo, node)
 
   console.debug(`getEdgeByNode returned ${edges.length} edges, minaz=${minaz}, maxaz=${maxaz}`)
 
@@ -126,7 +126,7 @@ function findAdjacentEdges (topology, node, data, other, edge) {
     }
 
     if (e.coordinates.length < 2) {
-      throw new Error(`corrupted topology: edge ${e.id} does not have two distinct points`)
+      throw new Error(`corrupted topo: edge ${e.id} does not have two distinct points`)
     }
 
     if (e.start === node) {
@@ -197,16 +197,16 @@ function findAdjacentEdges (topology, node, data, other, edge) {
   console.debug(`edges adjacent to azimuth ${data.az} (incident to node ${node.id}): CW:${sid(data.nextCW, data.nextCWDir)} (${minaz}) CCW:${sid(data.nextCCW, data.nextCCWDir)} (${maxaz})`)
 
   if (!edge && edges.length > 0 && data.cwFace !== data.ccwFace) {
-    throw new Error(`Corrupted topology: adjacent edges ${data.nextCW.id} and ${data.nextCCW.id} bind different face (${data.cwFace} and ${data.ccwFace})`)
+    throw new Error(`Corrupted topo: adjacent edges ${data.nextCW.id} and ${data.nextCCW.id} bind different face (${data.cwFace} and ${data.ccwFace})`)
   }
 
   return edges
 }
 
-function addEdge (topology, start, end, coordinates, modFace) {
+function addEdge (topo, start, end, coordinates, modFace) {
   console.debug('addEdge called')
 
-  const { edges, edgesTree } = topology
+  const { edges, edgesTree } = topo
 
   if (!isSimple(coordinates)) {
     throw new SpatialError('curve not simple')
@@ -265,10 +265,10 @@ function addEdge (topology, start, end, coordinates, modFace) {
     throw new SpatialError('end node not geometry end point')
   }
 
-  checkEdgeCrossing(topology, start, end, edge)
+  checkEdgeCrossing(topo, start, end, edge)
 
   const isClosed = start === end
-  const foundStart = findAdjacentEdges(topology, start, span, isClosed ? epan : undefined, undefined)
+  const foundStart = findAdjacentEdges(topo, start, span, isClosed ? epan : undefined, undefined)
 
   let prevLeft
   let prevLeftDir
@@ -305,7 +305,7 @@ function addEdge (topology, start, end, coordinates, modFace) {
     console.debug(`New edge is isolated on start node, next_right is ${sid(edge.nextRight, edge.nextRightDir)}, prev_left is ${sid(prevLeft, prevLeftDir)}`)
   }
 
-  const foundEnd = findAdjacentEdges(topology, end, epan, isClosed ? span : undefined, undefined)
+  const foundEnd = findAdjacentEdges(topo, end, epan, isClosed ? span : undefined, undefined)
 
   let prevRight
   let prevRightDir
@@ -347,9 +347,9 @@ function addEdge (topology, start, end, coordinates, modFace) {
   }
 
   if (edge.leftFace !== edge.rightFace) {
-    throw new Error('faces mismatch: invalid topology')
+    throw new Error('faces mismatch: invalid topo')
   } else if (edge.leftFace.id === -1) {
-    throw new Error('Could not derive edge face from linked primitives: invalid topology ?')
+    throw new Error('Could not derive edge face from linked primitives: invalid topo ?')
   }
 
   edgesTree.insert(edge)
@@ -389,14 +389,14 @@ function addEdge (topology, start, end, coordinates, modFace) {
   let newface1
 
   if (!modFace) {
-    newface1 = addFaceSplit(topology, edge, false, edge.leftFace, false)
+    newface1 = addFaceSplit(topo, edge, false, edge.leftFace, false)
     if (newface1 === 0) {
       console.debug('New edge does not split any face')
       return edge
     }
   }
 
-  let newface = addFaceSplit(topology, edge, true, edge.leftFace, false)
+  let newface = addFaceSplit(topo, edge, true, edge.leftFace, false)
 
   if (modFace) {
     if (newface === 0) {
@@ -405,18 +405,18 @@ function addEdge (topology, start, end, coordinates, modFace) {
     }
 
     if (newface < 0) {
-      newface = addFaceSplit(topology, edge, false, edge.leftFace, false)
+      newface = addFaceSplit(topo, edge, false, edge.leftFace, false)
       if (newface < 0) {
         return edge
       }
     } else {
-      addFaceSplit(topology, edge, false, edge.leftFace, true)
+      addFaceSplit(topo, edge, false, edge.leftFace, true)
     }
   }
 
   return edge
 }
 
-export function addEdgeNewFaces (topology, start, end, coordinates) {
-  return addEdge(topology, start, end, coordinates, false)
+export function addEdgeNewFaces (topo, start, end, coordinates) {
+  return addEdge(topo, start, end, coordinates, false)
 }
