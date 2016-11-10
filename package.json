@@ -48,7 +48,7 @@
   "scripts": {
     "test": "nyc mocha --timeout 10s --require babelhook --recursive test",
     "test-watch": "mocha -w --timeout 10s --require babelhook --recursive test",
-    "build": "rollup -c rollup.config.js | (cat HEADER.txt && cat) > dist/topolis.min.js",
+    "build": "rollup -c rollup.config.js | uglifyjs -c -m | (cat HEADER.txt && cat) > dist/topolis.min.js",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "jsdoc": "jsdoc -c doc/config.json"
   }

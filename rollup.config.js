@@ -15,7 +15,6 @@ export default {
       git_hash: git.short()
     }),
     babel({
-      exclude: 'node_modules/**',
       presets: ['es2015-rollup'],
       babelrc: false
     }),
