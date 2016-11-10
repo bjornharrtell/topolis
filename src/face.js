@@ -1,5 +1,5 @@
-import { calcWindingNumber } from './utils'
-import { sid, e2s } from './edge'
+import { calcWindingNumber, polygonize } from './utils'
+import { sid } from './edge'
 
 function getNodeByFace (topo, face) {
   // TODO: only within face mbr
@@ -46,6 +46,16 @@ function signedArea (shell) {
     p2 = p3
   }
   return sum / 2
+}
+
+export function getFaceGeometry (topo, face) {
+  const edges = getEdgeByFace(topo, face, false)
+  if (edges.length === 0) {
+    return []
+  } else {
+    const css = edges.map(e => e.coordinates)
+    return polygonize(css)
+  }
 }
 
 function getInteriorEdgePoint (coordinates) {

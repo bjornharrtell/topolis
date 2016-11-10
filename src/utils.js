@@ -2,6 +2,7 @@ import Coordinate from '../node_modules/jsts/src/org/locationtech/jts/geom/Coord
 import GeometryFactory from '../node_modules/jsts/src/org/locationtech/jts/geom/GeometryFactory'
 import IsSimpleOp from '../node_modules/jsts/src/org/locationtech/jts/operation/IsSimpleOp'
 import RelateOp from '../node_modules/jsts/src/org/locationtech/jts/operation/relate/RelateOp'
+import Polygonizer from '../node_modules/jsts/src/org/locationtech/jts/operation/polygonize/Polygonizer'
 import BoundaryNodeRule from '../node_modules/jsts/src/org/locationtech/jts/algorithm/BoundaryNodeRule'
 
 const factory = new GeometryFactory()
@@ -17,6 +18,14 @@ function toPoint (c) {
 
 function toPolygon (coordinates) {
   return factory.createPolygon(coordinates.map(c => new Coordinate(c[0], c[1])))
+}
+
+function polyToCoordss (poly) {
+  return [lineStringToCoords(poly.getExteriorRing())]
+}
+
+function lineStringToCoords (ls) {
+  return ls.getCoordinates().map(c => [c.x, c.y])
 }
 
 export function isSimple (coordinates) {
@@ -66,6 +75,14 @@ export function azimuth (a, b) {
   }
 
   return d
+}
+
+export function polygonize (css) {
+  const lss = css.map(toLineString)
+  const polygonizer = new Polygonizer()
+  lss.forEach(ls => polygonizer.add(ls))
+  const polys = polygonizer.getPolygons()
+  return polyToCoordss(polys.get(0))
 }
 
 function isLeft (c0, c1, c2) {
