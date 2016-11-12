@@ -64,7 +64,8 @@ describe('edge', () => {
   describe('addEdgeNewFaces', () => {
     it('should be able to add a closed edge', () => {
       const node = addIsoNode(topology, [0, 0])
-      const edge = addEdgeNewFaces(topology, node, node, [[0, 0], [0, 1], [1, 1], [0, 0]])
+      const result = addEdgeNewFaces(topology, node, node, [[0, 0], [0, 1], [1, 1], [0, 0]])
+      const edge = result.edge
 
       const universe = topology.faces[0]
       const newFace = topology.faces[1]
@@ -89,8 +90,10 @@ describe('edge', () => {
     it('should be able to add two edges forming a face', () => {
       const node1 = addIsoNode(topology, [0, 0])
       const node2 = addIsoNode(topology, [1, 1])
-      const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]])
-      const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]])
+      const result1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]])
+      const edge1 = result1.edge
+      const result2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]])
+      const edge2 = result2.edge
 
       const universe = topology.faces[0]
       const newFace = topology.faces[1]
@@ -126,9 +129,9 @@ describe('edge', () => {
     it('should be able to add three edges forming two faces', () => {
       const node1 = addIsoNode(topology, [0, 0])
       const node2 = addIsoNode(topology, [1, 1])
-      const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]])
-      const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]])
-      const edge3 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [1, 1]])
+      const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]]).edge
+      const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]]).edge
+      const edge3 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [1, 1]]).edge
 
       const universe = topology.faces[0]
       const face2 = topology.faces[2]

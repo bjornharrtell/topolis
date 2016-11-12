@@ -383,8 +383,10 @@ function addEdge (topo, start, end, coordinates, modFace) {
   }
 
   if (!isClosed && (epan.wasIsolated || span.wasIsolated)) {
-    return edge
+    return { edge }
   }
+
+  const oldFace = edge.leftFace
 
   let newface1
 
@@ -392,7 +394,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
     newface1 = addFaceSplit(topo, edge, false, edge.leftFace, false)
     if (newface1 === 0) {
       console.debug('New edge does not split any face')
-      return edge
+      return { edge }
     }
   }
 
@@ -401,20 +403,30 @@ function addEdge (topo, start, end, coordinates, modFace) {
   if (modFace) {
     if (newface === 0) {
       console.debug('New edge does not split any face')
-      return edge
+      return { edge }
     }
 
     if (newface < 0) {
       newface = addFaceSplit(topo, edge, false, edge.leftFace, false)
       if (newface < 0) {
-        return edge
+        return { edge }
       }
     } else {
       addFaceSplit(topo, edge, false, edge.leftFace, true)
     }
   }
 
-  return edge
+  let removedFace
+  if (oldFace !== topo.universe && !modFace) {
+    delete topo.faces[topo.faces.indexOf(oldFace)]
+    topo.facesTree.remove(oldFace)
+    removedFace = oldFace
+  }
+
+  return {
+    edge,
+    removedFace
+  }
 }
 
 export function addEdgeNewFaces (topo, start, end, coordinates) {
