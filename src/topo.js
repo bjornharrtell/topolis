@@ -1,5 +1,15 @@
+/** @module */
+
 import rbush from 'rbush'
 
+/**
+ * Create topology.
+ *
+ * @param {string} name
+ * @param {number} srid
+ * @param {number} tolerance
+ * @return {object} Topology data structure
+ */
 export function create (name, srid, tolerance) {
   const nodes = []
   const nodesTree = rbush(16)

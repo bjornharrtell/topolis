@@ -1,3 +1,5 @@
+/** @module */
+
 import { signedArea, pointInPoly, polygonize } from './utils'
 import { sid } from './edge'
 
@@ -25,6 +27,11 @@ function getEdgeByFace (topo, face, mbr) {
   // TODO: include within mbr
 }
 
+/**
+ * @param {object} topo
+ * @param {object} face
+ * @return {number[]}
+ */
 export function getFaceGeometry (topo, face) {
   const edges = getEdgeByFace(topo, face, false)
   if (edges.length === 0) {
@@ -40,6 +47,14 @@ function getInteriorEdgePoint (coordinates) {
   return coordinates[1]
 }
 
+/**
+ * @param {object} topo
+ * @param {object} edge
+ * @param {boolean} dir
+ * @param {object} face
+ * @param {boolean} mbrOnly
+ * @return {object}
+ */
 export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
   const faces = topo.faces
   const universe = topo.faces[0]

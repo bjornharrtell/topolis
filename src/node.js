@@ -1,5 +1,11 @@
+/** @module */
+
 import SpatialError from './SpatialError'
 
+/**
+ * @param {object} topo
+ * @param {number[]} coordinate
+ */
 export function getNodeByPoint (topo, coordinate) {
   const result = topo.nodesTree.search({
     minX: coordinate[0],
@@ -16,6 +22,10 @@ export function getNodeByPoint (topo, coordinate) {
   throw Error('getNodeByPoint: unexpected search result')
 }
 
+/**
+ * @param {object} topo
+ * @param {number[]} coordinate
+ */
 export function addIsoNode (topo, coordinate) {
   const { nodes, nodesTree: tree, faces } = topo
 

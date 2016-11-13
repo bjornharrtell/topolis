@@ -1,3 +1,5 @@
+/** @module */
+
 import SpatialError from './SpatialError'
 import { isSimple, relate, equals, azimuth } from './utils'
 import { addFaceSplit } from './face'
@@ -5,16 +7,32 @@ import { addFaceSplit } from './face'
 console.debug = console.log
 console.debug = function () {}
 
+/**
+ * @param {object} e
+ * @param {boolean} d
+ * @return {number}
+ */
 export function sid (e, d) {
   return d ? e.id : -e.id
 }
 
+/**
+ * @param {object} e
+ * @return {string}
+ */
 export function e2s (e) {
   const nl = sid(e.nextLeft, e.nextLeftDir)
   const nr = sid(e.nextRight, e.nextRightDir)
   return `${e.id}|${e.start.id}|${e.end.id}|${nl}|${nr}|${e.leftFace.id}|${e.rightFace.id}`
 }
 
+/**
+ * @param {object} topo
+ * @param {object} start
+ * @param {object} end
+ * @param {number[]} coordinates
+ * @return {object}
+ */
 export function addIsoEdge (topo, start, end, coordinates) {
   const { edges, edgesTree } = topo
 
@@ -431,6 +449,13 @@ function addEdge (topo, start, end, coordinates, modFace) {
   }
 }
 
+/**
+ * @param {object} topo
+ * @param {object} start
+ * @param {object} end
+ * @param {number[]} coordinates
+ * @return {object}
+ */
 export function addEdgeNewFaces (topo, start, end, coordinates) {
   return addEdge(topo, start, end, coordinates, false)
 }
