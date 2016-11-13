@@ -21,7 +21,8 @@ function toPolygon (coordinates) {
 }
 
 function polyToCoordss (poly) {
-  return [lineStringToCoords(poly.getExteriorRing())]
+  const cs = lineStringToCoords(poly.getExteriorRing())
+  return [cs]
 }
 
 function lineStringToCoords (ls) {
@@ -41,6 +42,29 @@ export function relate (cs1, cs2) {
 
 export function equals (c1, c2) {
   return c1[0] === c2[0] && c1[1] === c2[1]
+}
+
+export function signedArea (shell) {
+  if (shell.length < 3) {
+    return 0
+  }
+  let sum = 0
+  let x
+  let y1
+  let y2
+  let p1 = shell[0]
+  let p2 = shell[1]
+  const x0 = p1[0]
+  for (let i = 2; i < shell.length; i++) {
+    let p3 = shell[i]
+    x = p2[0] - x0
+    y1 = p3[1]
+    y2 = p1[1]
+    sum += x * (y2 - y1)
+    p1 = p2
+    p2 = p3
+  }
+  return sum / 2
 }
 
 export function azimuth (a, b) {
