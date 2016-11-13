@@ -129,7 +129,7 @@ describe('edge', () => {
       const edge5 = addEdgeNewFaces(topology, node1, node3, [[0, 0], [1, 1]]).edge
       const edge6 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0.25, 0.5], [0, 1]]).edge
 
-      // expect(e2s(edge1)).to.be('1|1|2|2|6|0|5') // is 1|1|2|2|6|0|4
+      expect(e2s(edge1)).to.be('1|1|2|2|6|0|5')
       expect(e2s(edge2)).to.be('2|2|3|3|-6|0|4')
       expect(e2s(edge3)).to.be('3|3|4|4|-5|0|2')
       expect(e2s(edge4)).to.be('4|4|1|1|-3|0|2')

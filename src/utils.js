@@ -92,7 +92,6 @@ function isLeft (c0, c1, c2) {
 export function pointInPoly (c, shell) {
   const point = toPoint(c)
   const polygon = toPolygon(shell)
-  console.log(polygon.shell.points.coordinates)
   return RelateOp.contains(polygon, point)
 }
 

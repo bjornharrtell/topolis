@@ -1,4 +1,4 @@
-import { calcWindingNumber, polygonize } from './utils'
+import { pointInPoly, polygonize } from './utils'
 import { sid } from './edge'
 
 function getNodeByFace (topo, face) {
@@ -158,7 +158,7 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
     }
 
     const ep = getInteriorEdgePoint(edge.coordinates)
-    const contains = calcWindingNumber(ep, shell) !== 0
+    const contains = pointInPoly(ep, shell)
 
     if (newFaceIsOutside) {
       if (contains) {
@@ -186,7 +186,7 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
   const nodes = getNodeByFace(topo, face)
 
   nodes.forEach(n => {
-    const contains = calcWindingNumber(n.coordinate, shell) !== 0
+    const contains = pointInPoly(n.coordinate, shell)
     console.debug(`Node ${n.id} is ${contains ? '' : 'not '}contained in new ring, newface is ${newFaceIsOutside ? 'outside' : 'inside'}`)
     if (newFaceIsOutside) {
       if (contains) {
