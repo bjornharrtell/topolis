@@ -12,7 +12,7 @@ export function sid (e, d) {
 export function e2s (e) {
   const nl = sid(e.nextLeft, e.nextLeftDir)
   const nr = sid(e.nextRight, e.nextRightDir)
-  return `ID: ${e.id} NL: ${nl} NR: ${nr} LF: ${e.leftFace.id} RF: ${e.rightFace.id}`
+  return `${e.id}|${e.start.id}|${e.end.id}|${nl}|${nr}|${e.leftFace.id}|${e.rightFace.id}`
 }
 
 export function addIsoEdge (topo, start, end, coordinates) {
