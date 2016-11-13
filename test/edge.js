@@ -151,5 +151,22 @@ describe('edge', () => {
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0.25 0.5, 0 1)'));
       */
     })
+
+    it('should be able to add two edges forming two faces', () => {
+      const node1 = addIsoNode(topology, [0, 0])
+      const edge1 = addEdgeNewFaces(topology, node1, node1, [[0, 0], [0, 1], [1, 1], [0, 0]]).edge
+      const edge2 = addEdgeNewFaces(topology, node1, node1, [[0, 0], [0, -1], [-1, -1], [0, 0]]).edge
+
+      expect(e2s(edge1)).to.be('1|1|1|2|-1|0|1')
+      expect(e2s(edge2)).to.be('2|1|1|1|-2|0|2')
+
+      /*
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
+      select st_addedgenewfaces('topo5', 1, 1, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1, 0 0)'));
+      select st_addedgenewfaces('topo5', 1, 1, ST_GeomFromText('LINESTRING(0 0, 0 -1, -1 -1, 0 0)'));
+      */
+    })
   })
 })

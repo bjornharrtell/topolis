@@ -164,7 +164,7 @@ function findAdjacentEdges (topo, node, data, other, edge) {
     if (e.end === node) {
       const p1 = e.coordinates[e.coordinates.length - 1]
       const p2 = e.coordinates[e.coordinates.length - 2]
-      console.debug(`edge ${e.id} starts on node ${node.id}, edgeend is ${p1[0]},${p1[1]}-${p2[0]},${p2[1]}`)
+      console.debug(`edge ${e.id} ends on node ${node.id}, edgeend is ${p1[0]},${p1[1]}-${p2[0]},${p2[1]}`)
       const az = azimuth(p1, p2)
       azdif = az - data.az
       console.debug(`azimuth of edge ${e.id}: ${az} (diff: ${azdif})`)
@@ -194,10 +194,12 @@ function findAdjacentEdges (topo, node, data, other, edge) {
     }
   })
 
-  console.debug(`edges adjacent to azimuth ${data.az} (incident to node ${node.id}): CW:${sid(data.nextCW, data.nextCWDir)} (${minaz}) CCW:${sid(data.nextCCW, data.nextCCWDir)} (${maxaz})`)
+  console.debug(`edges adjacent to azimuth ${data.az} (incident to node ${node.id}): CW:${sid(data.nextCW, data.nextCWDir)}(${minaz}) CCW:${sid(data.nextCCW, data.nextCCWDir)}(${maxaz})`)
 
   if (!edge && edges.length > 0 && data.cwFace !== data.ccwFace) {
-    throw new Error(`Corrupted topo: adjacent edges ${data.nextCW.id} and ${data.nextCCW.id} bind different face (${data.cwFace} and ${data.ccwFace})`)
+    if (data.cwFace.id !== -1 && data.ccwFace.id !== -1) {
+      throw new Error(`Corrupted topo: adjacent edges ${sid(data.nextCW, data.nextCWDir)} and ${sid(data.nextCCW, data.nextCCWDir)} bind different face (${data.cwFace.id} and ${data.ccwFace.id})`)
+    }
   }
 
   return edges
@@ -268,32 +270,32 @@ function addEdge (topo, start, end, coordinates, modFace) {
   checkEdgeCrossing(topo, start, end, edge)
 
   const isClosed = start === end
-  const foundStart = findAdjacentEdges(topo, start, span, isClosed ? epan : undefined, undefined)
+  const foundStart = findAdjacentEdges(topo, start, span, isClosed ? epan : undefined)
 
   let prevLeft
   let prevLeftDir
 
   if (foundStart.length > 0) {
     span.wasIsolated = false
-    if (span.nextCW) {
+    if (span.nextCW.id) {
       edge.nextRight = span.nextCW
       edge.nextRightDir = span.nextCWDir
     } else {
       edge.nextRight = edge
       edge.nextRightDir = false
     }
-    if (span.nextCCW) {
+    if (span.nextCCW.id) {
       prevLeft = span.nextCCW
       prevLeftDir = !span.nextCCWDir
     } else {
       prevLeft = edge
       prevLeftDir = true
     }
-    console.debug(`New edge is connected on start node, next_right is ${sid(edge.nextRight, edge.nextRightDir)}, prev_left is ${sid(prevLeft, prevLeftDir)}`)
+    console.debug(`New edge ${edge.id} is connected on start node, next_right is ${sid(edge.nextRight, edge.nextRightDir)}, prev_left is ${sid(prevLeft, prevLeftDir)}`)
     if (edge.rightFace.id === -1) {
       edge.rightFace = span.cwFace
     }
-    if (!edge.leftFace.id === -1) {
+    if (edge.leftFace.id === -1) {
       edge.leftFace = span.ccwFace
     }
   } else {
@@ -302,24 +304,24 @@ function addEdge (topo, start, end, coordinates, modFace) {
     edge.nextRightDir = !isClosed
     prevLeft = edge
     prevLeftDir = isClosed
-    console.debug(`New edge is isolated on start node, next_right is ${sid(edge.nextRight, edge.nextRightDir)}, prev_left is ${sid(prevLeft, prevLeftDir)}`)
+    console.debug(`New edge ${edge.id} is isolated on start node, next_right is ${sid(edge.nextRight, edge.nextRightDir)}, prev_left is ${sid(prevLeft, prevLeftDir)}`)
   }
 
-  const foundEnd = findAdjacentEdges(topo, end, epan, isClosed ? span : undefined, undefined)
+  const foundEnd = findAdjacentEdges(topo, end, epan, isClosed ? span : undefined)
 
   let prevRight
   let prevRightDir
 
   if (foundEnd.length > 0) {
     epan.wasIsolated = false
-    if (epan.nextCW) {
+    if (epan.nextCW.id) {
       edge.nextLeft = epan.nextCW
       edge.nextLeftDir = epan.nextCWDir
     } else {
       edge.nextLeft = edge
       edge.nextLeftDir = true
     }
-    if (epan.nextCCW) {
+    if (epan.nextCCW.id) {
       prevRight = epan.nextCCW
       prevRightDir = !epan.nextCCWDir
     } else {
@@ -343,11 +345,11 @@ function addEdge (topo, start, end, coordinates, modFace) {
     edge.nextLeftDir = isClosed
     prevRight = edge
     prevRightDir = !isClosed
-    console.debug(`New edge is isolated on end node, next_left is ${sid(edge.nextLeft, edge.nextLeftDir)}, prev_right is ${sid(prevRight, prevRightDir)}`)
+    console.debug(`New edge ${edge.id} is isolated on end node, next_left is ${sid(edge.nextLeft, edge.nextLeftDir)}, prev_right is ${sid(prevRight, prevRightDir)}`)
   }
 
   if (edge.leftFace !== edge.rightFace) {
-    throw new Error('faces mismatch: invalid topo')
+    throw new Error(`Left(${edge.leftFace.id})/right(${edge.rightFace.id}) faces mismatch: invalid topology ?`)
   } else if (edge.leftFace.id === -1) {
     throw new Error('Could not derive edge face from linked primitives: invalid topo ?')
   }
