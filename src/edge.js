@@ -133,7 +133,7 @@ function checkEdgeCrossing (topo, start, end, edge) {
   topo.edgesTree.search(edge).forEach(e => check(e, edge))
 }
 
-function getEdgesByNode (topo, node) {
+function getEdgeByNode (topo, node) {
   return topo.edges.filter(e => e.start === node || e.end === node)
 }
 
@@ -154,7 +154,7 @@ function findAdjacentEdges (topo, node, data, other, edge) {
 
   console.debug(`Looking for edges incident to node ${node.id} and adjacent to azimuth ${data.az}`)
 
-  const edges = getEdgesByNode(topo, node)
+  const edges = getEdgeByNode(topo, node)
 
   console.debug(`getEdgeByNode returned ${edges.length} edges, minaz=${minaz}, maxaz=${maxaz}`)
 
@@ -493,4 +493,109 @@ export function addEdgeNewFaces (topo, start, end, coordinates) {
  */
 export function addEdgeModFace (topo, start, end, coordinates) {
   return addEdge(topo, start, end, coordinates, true)
+}
+
+function remEdge (topo, edge, modFace) {
+  console.debug('Updating next_{right,left}_face of ring edges...')
+
+  const updEdge = getEdgeByNode(edge.start)
+  const updEdgeLeft = []
+  const updEdgeRight = []
+  // const updNode = []
+  let nedgeLeft = 0
+  let nedgeRight = 0
+  // let fnodeEdges = 0
+  // let lnodeEdges = 0
+
+  updEdge.forEach(e => {
+    if (e === edge) {
+      return
+    }
+    if (e.start === edge.start || e.end === edge.end) {
+      // fnodeEdges++
+    }
+    if (e.start === edge.end || e.end === edge.start) {
+      // lnodeEdges++
+    }
+    if (e.nextLeft === edge && !e.nextLeftDir) {
+      updEdgeLeft[nedgeLeft] = {
+        edge: e,
+        nextLeft: edge.nextLeft === edge && edge.nextLeftDir ? edge.nextRight : edge.nextLeft
+      }
+      nedgeLeft++
+    } else if (e.nextLeft === edge && e.nextLeftDir) {
+      updEdgeLeft[nedgeLeft] = {
+        edge: e,
+        nextLeft: edge.nextRight === edge && !edge.nextLeftDir ? edge.nextLeft : edge.nextRight
+      }
+      nedgeLeft++
+    }
+
+    if (e.nextRight === edge && !e.nextRightDir) {
+      updEdgeRight[nedgeRight] = {
+        edge: e,
+        nextRight: edge.nextLeft === edge && edge.nextLeftDir ? edge.nextRight : edge.nextLeft
+      }
+      nedgeRight++
+    } else if (e.nextLeft === edge && e.nextLeftDir) {
+      updEdgeRight[nedgeRight] = {
+        edge: e,
+        nextRight: edge.nextRight === edge && !edge.nextLeftDir ? edge.nextLeft : edge.nextRight
+      }
+      nedgeRight++
+    }
+
+    if (nedgeLeft) {
+      updEdgeLeft.forEach(ue => {
+        ue.edge.nextLeft = ue.nextLeft
+      })
+    }
+
+    if (nedgeRight) {
+      updEdgeLeft.forEach(ue => {
+        ue.edge.nextRight = ue.nextRight
+      })
+    }
+
+    let floodface
+    let newface
+
+    // TODO: new face(s)
+
+    // TODO: del edge
+
+    // TODO: update nodes
+
+    // TODO: remove face
+
+    return modFace ? floodface : newface
+  })
+}
+
+export function remEdgeNewFaces (topo, edge) {
+  return remEdge(topo, edge, false)
+}
+
+export function remEdgeModFace (topo, edge) {
+  return remEdge(topo, edge, true)
+}
+
+function healEdges (topo, e1, e2, modEdge) {
+  return
+}
+
+export function modEdgeHeal (topo, e1, e2) {
+  return healEdges(topo, e1, e2, true)
+}
+
+export function newEdgeHeal (topo, e1, e2) {
+  return healEdges(topo, e1, e2, false)
+}
+
+export function modEdgeSplit (topo, edge, coordinate, skipISOChecks) {
+  return
+}
+
+export function newEdgesSplit (topo, edge, coordinate, skipISOChecks) {
+  return
 }
