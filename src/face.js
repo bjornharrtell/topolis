@@ -3,12 +3,22 @@
 import { signedArea, pointInPoly, polygonize } from './utils'
 import { sid } from './edge'
 
+/**
+ * Face definition
+ *
+ * @typedef {Object} Face
+ * @property {number} id Face ID
+ */
+
 function getNodeByFace (topo, face) {
   // TODO: only within face mbr
   return topo.nodes.filter(n => n.face === face)
 }
 
-function getRingEdges (topo, edge, dir, limit, foundEdges) {
+/**
+ * Returns the ordered set of signed edge identifiers met by walking on an a given edge side.
+ */
+export function getRingEdges (topo, edge, dir, limit, foundEdges) {
   foundEdges = foundEdges || []
   foundEdges.push({ edge, dir })
 
@@ -28,9 +38,10 @@ function getEdgeByFace (topo, face, mbr) {
 }
 
 /**
- * @param {object} topo
- * @param {object} face
- * @return {number[]}
+ * Returns the polygon in the given topology with the specified face.
+ * @param {module:topo~Topo} topo
+ * @param {module:face~Face} face
+ * @return {number[][][]}
  */
 export function getFaceGeometry (topo, face) {
   const edges = getEdgeByFace(topo, face, false)
@@ -48,12 +59,13 @@ function getInteriorEdgePoint (coordinates) {
 }
 
 /**
- * @param {object} topo
- * @param {object} edge
+ * @param {module:topo~Topo} topo
+ * @param {module:edge~Edge} edge
  * @param {boolean} dir
- * @param {object} face
+ * @param {module:face~Face} face
  * @param {boolean} mbrOnly
- * @return {object}
+ * @return {module:face~Face}
+ * @private
  */
 export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
   const faces = topo.faces

@@ -4,11 +4,29 @@ import SpatialError from './SpatialError'
 import { isSimple, relate, equals, azimuth } from './utils'
 import { addFaceSplit } from './face'
 
+/**
+ * Edge definition
+ *
+ * @typedef {Object} Edge
+ * @property {number} id Edge ID
+ * @property {module:node~Node} start
+ * @property {module:node~Node} end
+ * @property {number[][]} coordinates Coordinates
+ * @property {module:edge~Edge} nextLeft
+ * @property {module:edge~Edge} nextRight
+ * @property {module:face~Face} leftFace
+ * @property {module:face~Face} rightFace
+ * @property {number} minX Minimum X of bounds
+ * @property {number} maxY Maximum Y of bounds
+ * @property {number} minX Minimum X of bounds
+ * @property {number} maxY Maximum Y of bounds
+ */
+
 console.debug = console.log
 console.debug = function () {}
 
 /**
- * @param {object} e
+ * @param {module:edge~Edge} e
  * @param {boolean} d
  * @return {number}
  */
@@ -17,7 +35,7 @@ export function sid (e, d) {
 }
 
 /**
- * @param {object} e
+ * @param {module:edge~Edge} e
  * @return {string}
  */
 export function e2s (e) {
@@ -27,11 +45,13 @@ export function e2s (e) {
 }
 
 /**
- * @param {object} topo
- * @param {object} start
- * @param {object} end
- * @param {number[]} coordinates
- * @return {object}
+ * Adds an isolated edge defined by geometry alinestring to a topology connecting two existing isolated nodes anode and anothernode and returns the edge id of the new edge.
+ *
+ * @param {module:topo~Topo} topo
+ * @param {module:node~Node} start
+ * @param {module:node~Node} end
+ * @param {number[][]} coordinates
+ * @return {module:edge~Edge}
  */
 export function addIsoEdge (topo, start, end, coordinates) {
   const { edges, edgesTree } = topo
@@ -450,12 +470,27 @@ function addEdge (topo, start, end, coordinates, modFace) {
 }
 
 /**
- * @param {object} topo
- * @param {object} start
- * @param {object} end
- * @param {number[]} coordinates
- * @return {object}
+ * Add a new edge and, if in doing so it splits a face, delete the original face and replace it with two new faces.
+ *
+ * @param {module:topo~Topo} topo
+ * @param {module:node~Node} start
+ * @param {module:node~Node} end
+ * @param {number[][]} coordinates
+ * @return {module:edge~Edge}
  */
 export function addEdgeNewFaces (topo, start, end, coordinates) {
   return addEdge(topo, start, end, coordinates, false)
+}
+
+/**
+ * Add a new edge and, if in doing so it splits a face, modify the original face and add a new face.
+ *
+ * @param {module:topo~Topo} topo
+ * @param {module:node~Node[]} start
+ * @param {module:node~Node} end
+ * @param {number[][]} coordinates
+ * @return {module:edge~Edge}
+ */
+export function addEdgeModFace (topo, start, end, coordinates) {
+  return addEdge(topo, start, end, coordinates, true)
 }

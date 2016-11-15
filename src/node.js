@@ -3,8 +3,24 @@
 import SpatialError from './SpatialError'
 
 /**
+ * Node definition
+ *
+ * @typedef {Object} Node
+ * @property {number} id Node ID
+ * @property {object} face Containing face
+ * @property {number[]} coordinate Coordinate
+ * @property {number} minX Minimum X of bounds
+ * @property {number} maxY Maximum Y of bounds
+ * @property {number} minX Minimum X of bounds
+ * @property {number} maxY Maximum Y of bounds
+ */
+
+/**
+ * Find the node at a point location.
+ *
  * @param {object} topo
  * @param {number[]} coordinate
+ * @return {module:node~Node}
  */
 export function getNodeByPoint (topo, coordinate) {
   const result = topo.nodesTree.search({
@@ -23,8 +39,11 @@ export function getNodeByPoint (topo, coordinate) {
 }
 
 /**
+ * Adds an isolated node to a face in a topology and returns the new node. If face is null, the node is still created.
+ *
  * @param {object} topo
  * @param {number[]} coordinate
+ * @return {Node}
  */
 export function addIsoNode (topo, coordinate) {
   const { nodes, nodesTree: tree, faces } = topo

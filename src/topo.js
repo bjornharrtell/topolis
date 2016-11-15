@@ -3,12 +3,25 @@
 import rbush from 'rbush'
 
 /**
+ * Topo definition
+ *
+ * @typedef {Object} Topo
+ * @property {module:node~Node[]} nodes
+ * @property {Object} nodesTree
+ * @property {module:edge~Edge[]} edges
+ * @property {Object} edgesTree
+ * @property {module:face~Face[]} faces
+ * @property {Object} facesTree
+ * @property {module:face~Face} universe
+ */
+
+/**
  * Create topology.
  *
  * @param {string} name
  * @param {number} srid
  * @param {number} tolerance
- * @return {object} Topology data structure
+ * @return {module:topo~Topo}
  */
 export function create (name, srid, tolerance) {
   const nodes = []
