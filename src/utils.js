@@ -4,12 +4,17 @@ import IsSimpleOp from '../node_modules/jsts/src/org/locationtech/jts/operation/
 import RelateOp from '../node_modules/jsts/src/org/locationtech/jts/operation/relate/RelateOp'
 import Polygonizer from '../node_modules/jsts/src/org/locationtech/jts/operation/polygonize/Polygonizer'
 import BoundaryNodeRule from '../node_modules/jsts/src/org/locationtech/jts/algorithm/BoundaryNodeRule'
+import LengthIndexedLine from '../node_modules/jsts/src/org/locationtech/jts/linearref/LengthIndexedLine'
 
 const factory = new GeometryFactory()
 const isSimpleOp = new IsSimpleOp()
 
 function toLineString (coordinates) {
   return factory.createLineString(coordinates.map(c => new Coordinate(c[0], c[1])))
+}
+
+function toCoordinate (c) {
+  return new Coordinate(c[0], c[1])
 }
 
 function toPoint (c) {
@@ -107,6 +112,18 @@ export function polygonize (css) {
   lss.forEach(ls => polygonizer.add(ls))
   const polys = polygonizer.getPolygons()
   return polyToCoordss(polys.get(0))
+}
+
+export function split (coordinates, coordinate) {
+  const ls = toLineString(coordinates)
+  const c = toCoordinate(coordinate)
+  const lil = new LengthIndexedLine(ls)
+  const splitIndex = lil.project(c)
+  const ls1 = lil.extractLine(lil.getStartIndex(), splitIndex)
+  const ls2 = lil.extractLine(splitIndex, lil.getEndIndex())
+  const cs1 = lineStringToCoords(ls1)
+  const cs2 = lineStringToCoords(ls2)
+  return [cs1, cs2]
 }
 
 function isLeft (c0, c1, c2) {

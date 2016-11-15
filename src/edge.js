@@ -1,7 +1,8 @@
 /** @module */
 
 import SpatialError from './SpatialError'
-import { isSimple, relate, equals, azimuth } from './utils'
+import { isSimple, relate, equals, azimuth, split } from './utils'
+import { insertNode } from './node'
 import { addFaceSplit } from './face'
 
 /**
@@ -241,6 +242,19 @@ function findAdjacentEdges (topo, node, data, other, edge) {
   }
 
   return edges
+}
+
+function insertEdge (topo, edge) {
+  const { edges, edgesTree } = topo
+  const xs = edge.coordinates.map(c => c[0])
+  const ys = edge.coordinates.map(c => c[1])
+  edge.id = edges.length + 1
+  edge.minX = Math.min(...xs)
+  edge.minY = Math.min(...ys)
+  edge.maxX = Math.max(...xs)
+  edge.maxY = Math.max(...ys)
+  edgesTree.insert(edge)
+  edges.push(edge)
 }
 
 function addEdge (topo, start, end, coordinates, modFace) {
@@ -592,8 +606,50 @@ export function newEdgeHeal (topo, e1, e2) {
   return healEdges(topo, e1, e2, false)
 }
 
-export function modEdgeSplit (topo, edge, coordinate, skipISOChecks) {
-  return
+export function modEdgeSplit (topo, edge, coordinate) {
+  const { edges } = topo
+
+  const parts = split(edge.coordinates, coordinate)
+
+  const splitCoordinate = parts[0][parts[0].length - 1]
+
+  const node = {
+    face: { id: -1 },
+    coordinate: splitCoordinate
+  }
+
+  insertNode(topo, node)
+
+  const newedge1 = {
+    start: node,
+    end: edge.end,
+    leftFace: edge.leftFace,
+    rightFace: edge.rightFace
+  }
+  newedge1.nextLeft = edge.nextLeftDir ? edge.nextLeft : newedge1
+  newedge1.nextLeftDir = edge.nextLeftDir ? edge.nextLeftDir : false
+  newedge1.nextRight = edge.nextRight
+  newedge1.nextRightDir = false
+  newedge1.coordinates = parts[1]
+
+  insertEdge(topo, newedge1)
+
+  const oldEnd = edge.end
+
+  edge.coordinates = parts[0]
+  edge.nextLeft = newedge1
+  edge.nextLeftDir = true
+  edge.end = node
+
+  edges
+    .filter(e => e.nextRight === edge && !e.nextRightDir && e.start === oldEnd)
+    .forEach(e => { e.nextRight = e; e.nextRightDir = false })
+
+  edges
+    .filter(e => e.nextLeft === edge && !e.nextLeftDir && e.end === oldEnd)
+    .forEach(e => { e.nextLeft = e; e.nextRightDir = false })
+
+  return node
 }
 
 export function newEdgesSplit (topo, edge, coordinate, skipISOChecks) {

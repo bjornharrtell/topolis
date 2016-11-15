@@ -2,7 +2,7 @@ import expect from 'expect.js'
 
 import { create as createTopology } from '../src/topo'
 import { addIsoNode } from '../src/node'
-import { e2s, addIsoEdge, addEdgeNewFaces } from '../src/edge'
+import { e2s, addIsoEdge, addEdgeNewFaces, modEdgeSplit } from '../src/edge'
 
 let topology
 
@@ -166,6 +166,34 @@ describe('edge', () => {
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addedgenewfaces('topo5', 1, 1, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1, 0 0)'));
       select st_addedgenewfaces('topo5', 1, 1, ST_GeomFromText('LINESTRING(0 0, 0 -1, -1 -1, 0 0)'));
+      */
+    })
+  })
+
+  describe('modEdgeSplit', () => {
+    it('should split', () => {
+      const node1 = addIsoNode(topology, [0, 0])
+      const node2 = addIsoNode(topology, [1, 1])
+      addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]]).edge
+      addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]]).edge
+      const edge = addEdgeNewFaces(topology, node1, node2, [[0, 0], [1, 1]]).edge
+      const node = modEdgeSplit(topology, edge, [0.5, 0.5])
+
+      expect(e2s(edge)).to.be('3|1|3|4|-2|3|2')
+      expect(edge.coordinates).to.eql([ [ 0, 0 ], [ 0.5, 0.5 ] ])
+      expect(e2s(edge.nextLeft)).to.be('4|3|2|-4|-2|3|2')
+      expect(edge.nextLeft.coordinates).to.eql([ [ 0.5, 0.5 ], [ 1, 1 ] ])
+      expect(node.id).to.be(3)
+
+      /* equivalent postgis topo
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
+      select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
+      select st_addedgenewfaces('topo5', 2, 1, ST_GeomFromText('LINESTRING(1 1, 1 0, 0 0)'));
+      select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 1 1)'));
+      select st_modedgesplit('topo5', 3, ST_GeomFromText('POINT(0 0, 0.5 0.5)'));
       */
     })
   })
