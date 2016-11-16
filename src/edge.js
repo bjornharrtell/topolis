@@ -1,7 +1,7 @@
 /** @module */
 
 import SpatialError from './SpatialError'
-import { isSimple, relate, equals, azimuth, split } from './utils'
+import { isSimple, relate, equals, azimuth, split, distance } from './utils'
 import { insertNode } from './node'
 import { addFaceSplit } from './face'
 
@@ -43,6 +43,26 @@ export function e2s (e) {
   const nl = sid(e.nextLeft, e.nextLeftDir)
   const nr = sid(e.nextRight, e.nextRightDir)
   return `${e.id}|${e.start.id}|${e.end.id}|${nl}|${nr}|${e.leftFace.id}|${e.rightFace.id}`
+}
+
+export function getEdgeByPoint (topo, c, tol) {
+  const result = topo.edgesTree.search({
+    minX: c[0] - tol,
+    minY: c[1] - tol,
+    maxX: c[0] + tol,
+    maxY: c[1] + tol
+  })
+
+  const candidates = result.filter(e => distance(c, e.coordinates) < tol)
+
+  if (candidates.length === 1) {
+    return candidates[0]
+  } else if (candidates.length === 0) {
+    return 0
+  } else {
+    console.log(candidates)
+    throw new Error('Unexpected number of edges found')
+  }
 }
 
 /**
@@ -607,7 +627,7 @@ export function newEdgeHeal (topo, e1, e2) {
 }
 
 export function modEdgeSplit (topo, edge, coordinate) {
-  const { edges } = topo
+  const { edges, edgesTree } = topo
 
   const parts = split(edge.coordinates, coordinate)
 
@@ -640,6 +660,14 @@ export function modEdgeSplit (topo, edge, coordinate) {
   edge.nextLeft = newedge1
   edge.nextLeftDir = true
   edge.end = node
+  edgesTree.remove(edge)
+  const xs = edge.coordinates.map(c => c[0])
+  const ys = edge.coordinates.map(c => c[1])
+  edge.minX = Math.min(...xs)
+  edge.minY = Math.min(...ys)
+  edge.maxX = Math.max(...xs)
+  edge.maxY = Math.max(...ys)
+  edgesTree.insert(edge)
 
   edges
     .filter(e => e.nextRight === edge && !e.nextRightDir && e.start === oldEnd)

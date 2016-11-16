@@ -2,6 +2,7 @@ import Coordinate from '../node_modules/jsts/src/org/locationtech/jts/geom/Coord
 import GeometryFactory from '../node_modules/jsts/src/org/locationtech/jts/geom/GeometryFactory'
 import IsSimpleOp from '../node_modules/jsts/src/org/locationtech/jts/operation/IsSimpleOp'
 import RelateOp from '../node_modules/jsts/src/org/locationtech/jts/operation/relate/RelateOp'
+import DistanceOp from '../node_modules/jsts/src/org/locationtech/jts/operation/distance/DistanceOp'
 import Polygonizer from '../node_modules/jsts/src/org/locationtech/jts/operation/polygonize/Polygonizer'
 import BoundaryNodeRule from '../node_modules/jsts/src/org/locationtech/jts/algorithm/BoundaryNodeRule'
 import LengthIndexedLine from '../node_modules/jsts/src/org/locationtech/jts/linearref/LengthIndexedLine'
@@ -128,6 +129,12 @@ export function split (coordinates, coordinate) {
 
 function isLeft (c0, c1, c2) {
   return ((c1[0] - c0[0]) * (c2[1] - c0[1])) - ((c2[0] - c0[0]) * (c1[1] - c0[1]))
+}
+
+export function distance (c, cs) {
+  const point = toPoint(c)
+  const lineString = toLineString(cs)
+  return DistanceOp.distance(point, lineString)
 }
 
 export function pointInPoly (c, shell) {
