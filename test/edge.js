@@ -171,7 +171,7 @@ describe('edge', () => {
   })
 
   describe('modEdgeSplit', () => {
-    it('should split', () => {
+    it('should split a middle edge into two edges', () => {
       const node1 = addIsoNode(topology, [0, 0])
       const node2 = addIsoNode(topology, [1, 1])
       addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]]).edge
@@ -181,7 +181,7 @@ describe('edge', () => {
 
       expect(e2s(edge)).to.be('3|1|3|4|-2|3|2')
       expect(edge.coordinates).to.eql([ [ 0, 0 ], [ 0.5, 0.5 ] ])
-      expect(e2s(edge.nextLeft)).to.be('4|3|2|-4|-2|3|2')
+      expect(e2s(edge.nextLeft)).to.be('4|3|2|-1|-3|3|2')
       expect(edge.nextLeft.coordinates).to.eql([ [ 0.5, 0.5 ], [ 1, 1 ] ])
       expect(node.id).to.be(3)
 
@@ -193,7 +193,7 @@ describe('edge', () => {
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
       select st_addedgenewfaces('topo5', 2, 1, ST_GeomFromText('LINESTRING(1 1, 1 0, 0 0)'));
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 1 1)'));
-      select st_modedgesplit('topo5', 3, ST_GeomFromText('POINT(0 0, 0.5 0.5)'));
+      select st_modedgesplit('topo5', 3, ST_GeomFromText('POINT(0.5 0.5)'));
       */
     })
   })

@@ -646,9 +646,9 @@ export function modEdgeSplit (topo, edge, coordinate) {
     leftFace: edge.leftFace,
     rightFace: edge.rightFace
   }
-  newedge1.nextLeft = edge.nextLeftDir ? edge.nextLeft : newedge1
-  newedge1.nextLeftDir = edge.nextLeftDir ? edge.nextLeftDir : false
-  newedge1.nextRight = edge.nextRight
+  newedge1.nextLeft = edge.nextLeftDir ? newedge1 : edge.nextLeft
+  newedge1.nextLeftDir = edge.nextLeftDir ? false : edge.nextLeftDir
+  newedge1.nextRight = edge
   newedge1.nextRightDir = false
   newedge1.coordinates = parts[1]
 
