@@ -60,7 +60,6 @@ export function getEdgeByPoint (topo, c, tol) {
   } else if (candidates.length === 0) {
     return 0
   } else {
-    console.log(candidates)
     throw new Error('Unexpected number of edges found')
   }
 }
@@ -646,8 +645,8 @@ export function modEdgeSplit (topo, edge, coordinate) {
     leftFace: edge.leftFace,
     rightFace: edge.rightFace
   }
-  newedge1.nextLeft = edge.nextLeftDir ? newedge1 : edge.nextLeft
-  newedge1.nextLeftDir = edge.nextLeftDir ? false : edge.nextLeftDir
+  newedge1.nextLeft = edge.nextLeft === edge && !edge.nextLeftDir ? newedge1 : edge.nextLeft
+  newedge1.nextLeftDir = edge.nextLeft === edge && !edge.nextLeftDir ? false : edge.nextLeftDir
   newedge1.nextRight = edge
   newedge1.nextRightDir = false
   newedge1.coordinates = parts[1]
@@ -670,12 +669,12 @@ export function modEdgeSplit (topo, edge, coordinate) {
   edgesTree.insert(edge)
 
   edges
-    .filter(e => e.nextRight === edge && !e.nextRightDir && e.start === oldEnd)
-    .forEach(e => { e.nextRight = e; e.nextRightDir = false })
+    .filter(e => e.nextRight === edge && !e.nextRightDir && e.start === oldEnd && e !== newedge1)
+    .forEach(e => { e.nextRight = newedge1; e.nextRightDir = false })
 
   edges
-    .filter(e => e.nextLeft === edge && !e.nextLeftDir && e.end === oldEnd)
-    .forEach(e => { e.nextLeft = e; e.nextRightDir = false })
+    .filter(e => e.nextLeft === edge && !e.nextLeftDir && e.end === oldEnd && e !== newedge1)
+    .forEach(e => { e.nextLeft = newedge1; e.nextLeftDir = false })
 
   return node
 }

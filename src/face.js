@@ -22,8 +22,8 @@ export function getRingEdges (topo, edge, dir, limit, foundEdges) {
   foundEdges = foundEdges || []
   foundEdges.push({ edge, dir })
 
-  const nextDir = dir ? edge.nextLeftDir : edge.nextRightDir
   const nextEdge = dir ? edge.nextLeft : edge.nextRight
+  const nextDir = dir ? edge.nextLeftDir : edge.nextRightDir
 
   if (!foundEdges.some(fe => fe.edge === nextEdge && fe.dir === nextDir)) {
     return getRingEdges(topo, nextEdge, nextDir, 0, foundEdges)
@@ -68,6 +68,8 @@ function getInteriorEdgePoint (coordinates) {
  * @private
  */
 export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
+  console.debug(`addFaceSplit called on edge ${sid(edge, dir)} and face ${face.id}`)
+
   const faces = topo.faces
   const universe = topo.faces[0]
 

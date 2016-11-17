@@ -174,16 +174,17 @@ describe('edge', () => {
     it('should split a middle edge into two edges', () => {
       const node1 = addIsoNode(topology, [0, 0])
       const node2 = addIsoNode(topology, [1, 1])
-      addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]]).edge
-      addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]]).edge
-      const edge = addEdgeNewFaces(topology, node1, node2, [[0, 0], [1, 1]]).edge
-      const node = modEdgeSplit(topology, edge, [0.5, 0.5])
+      const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]]).edge
+      const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]]).edge
+      const edge3 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [1, 1]]).edge
+      const node3 = modEdgeSplit(topology, edge3, [0.5, 0.5])
+      const edge4 = edge3.nextLeft
 
-      expect(e2s(edge)).to.be('3|1|3|4|-2|3|2')
-      expect(edge.coordinates).to.eql([ [ 0, 0 ], [ 0.5, 0.5 ] ])
-      expect(e2s(edge.nextLeft)).to.be('4|3|2|-1|-3|3|2')
-      expect(edge.nextLeft.coordinates).to.eql([ [ 0.5, 0.5 ], [ 1, 1 ] ])
-      expect(node.id).to.be(3)
+      expect(e2s(edge1)).to.be('1|1|2|2|3|0|3')
+      expect(e2s(edge2)).to.be('2|2|1|1|-4|0|2')
+      expect(e2s(edge3)).to.be('3|1|3|4|-2|3|2')
+      expect(e2s(edge4)).to.be('4|3|2|-1|-3|3|2')
+      expect(node3.coordinate).to.eql([0.5, 0.5])
 
       /* equivalent postgis topo
       select droptopology('topo5');
@@ -197,4 +198,47 @@ describe('edge', () => {
       */
     })
   })
+
+  describe('modEdgeSplit', () => {
+    it('should split two edges and one face into five edges and two faces', () => {
+      const node1 = addIsoNode(topology, [0, 0])
+      const node2 = addIsoNode(topology, [1, 1])
+      const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]]).edge
+      const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]]).edge
+      const node3 = modEdgeSplit(topology, edge1, [0, 1])
+      const edge3 = edge1.nextLeft
+      const node4 = modEdgeSplit(topology, edge2, [1, 0])
+      const edge4 = edge2.nextLeft
+      const edge5 = addEdgeNewFaces(topology, node3, node4, [[0, 1], [1, 0]]).edge
+
+      expect(e2s(edge1)).to.be('1|1|3|3|-4|0|2')
+      expect(e2s(edge2)).to.be('2|2|4|4|-3|0|3')
+      expect(e2s(edge3)).to.be('3|3|2|2|5|0|3')
+      expect(e2s(edge4)).to.be('4|4|1|1|-5|0|2')
+      expect(e2s(edge5)).to.be('5|3|4|-2|-1|3|2')
+      expect(node3.coordinate).to.eql([0, 1])
+      expect(node4.coordinate).to.eql([1, 0])
+
+      /*
+      expect(e2s(edge)).to.be('3|1|3|4|-2|3|2')
+      expect(edge.coordinates).to.eql([ [ 0, 0 ], [ 0.5, 0.5 ] ])
+      expect(e2s(edge.nextLeft)).to.be('4|3|2|-1|-3|3|2')
+      expect(edge.nextLeft.coordinates).to.eql([ [ 0.5, 0.5 ], [ 1, 1 ] ])
+      expect(node.id).to.be(3)
+      */
+
+      /* equivalent postgis topo
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
+      select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
+      select st_addedgenewfaces('topo5', 2, 1, ST_GeomFromText('LINESTRING(1 1, 1 0, 0 0)'));
+      select st_modedgesplit('topo5', 1, ST_GeomFromText('POINT(0 1)'));
+      select st_modedgesplit('topo5', 2, ST_GeomFromText('POINT(1 0)'));
+      select st_addedgenewfaces('topo5', 3, 4, ST_GeomFromText('LINESTRING(0 1, 1 0)'));
+      */
+    })
+  })
+
 })
