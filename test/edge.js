@@ -2,7 +2,7 @@ import expect from 'expect.js'
 
 import { create as createTopology } from '../src/topo'
 import { addIsoNode } from '../src/node'
-import { e2s, addIsoEdge, addEdgeNewFaces, modEdgeSplit } from '../src/edge'
+import { e2s, addIsoEdge, addEdgeNewFaces, modEdgeSplit, remEdgeNewFaces } from '../src/edge'
 
 let topology
 
@@ -241,4 +241,16 @@ describe('edge', () => {
     })
   })
 
+  describe('remEdgeNewFaces', () => {
+    it('should split two edges and one face into five edges and two faces', () => {
+      const node = addIsoNode(topology, [0, 0])
+      const edge = addEdgeNewFaces(topology, node, node, [[0, 0], [0, 1], [1, 1], [0, 0]]).edge
+      remEdgeNewFaces(topology, edge)
+
+      // topology.edges.forEach(e => console.log(e2s(e)))
+      // console.log(topology.edges.length)
+
+      expect(e2s(edge)).to.be('1|1|1|1|-1|0|1')
+    })
+  })
 })

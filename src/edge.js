@@ -531,7 +531,9 @@ export function addEdgeModFace (topo, start, end, coordinates) {
 function remEdge (topo, edge, modFace) {
   console.debug('Updating next_{right,left}_face of ring edges...')
 
-  const updEdge = getEdgeByNode(edge.start)
+  const { universe, edges, edgesTree } = topo
+
+  const updEdge = getEdgeByNode(topo, edge.start)
   const updEdgeLeft = []
   const updEdgeRight = []
   // const updNode = []
@@ -577,32 +579,71 @@ function remEdge (topo, edge, modFace) {
       }
       nedgeRight++
     }
-
-    if (nedgeLeft) {
-      updEdgeLeft.forEach(ue => {
-        ue.edge.nextLeft = ue.nextLeft
-      })
-    }
-
-    if (nedgeRight) {
-      updEdgeLeft.forEach(ue => {
-        ue.edge.nextRight = ue.nextRight
-      })
-    }
-
-    let floodface
-    let newface
-
-    // TODO: new face(s)
-
-    // TODO: del edge
-
-    // TODO: update nodes
-
-    // TODO: remove face
-
-    return modFace ? floodface : newface
   })
+
+  if (nedgeLeft) {
+    updEdgeLeft.forEach(ue => {
+      ue.edge.nextLeft = ue.nextLeft
+    })
+  }
+
+  if (nedgeRight) {
+    updEdgeLeft.forEach(ue => {
+      ue.edge.nextRight = ue.nextRight
+    })
+  }
+
+  let floodface
+  let newface
+
+  if (edge.leftFace === edge.rightFace) {
+    floodface = edge.rightFace
+  } else {
+    if (edge.leftFace.id === 0 || edge.rightFace.id === 0) {
+      floodface = universe
+      console.debug('floodface is universe')
+    } else {
+      floodface = edge.rightFace
+      console.debug('floodface is ' + floodface.id)
+      // TODO: merge bboxes
+      if (modFace) {
+        newface = floodface
+      } else {
+        // TODO: insert new face
+        // TODO: floodface = new face
+      }
+    }
+
+    if (edge.leftFace !== floodface) {
+      // TODO: _lwt_UpdateEdgeFaceRef _lwt_UpdateNodeFaceRef
+    }
+
+    if (edge.rightFace !== floodface) {
+      // TODO: _lwt_UpdateEdgeFaceRef _lwt_UpdateNodeFaceRef
+    }
+  }
+
+  edgesTree.remove(edge)
+  delete edges[edges.indexOf(edge)]
+
+  // TODO: update nodes
+
+  // FIXME: edge face refs changed here, need to save them before modification
+  if (edge.leftFace !== edge.rightFace) {
+    if (edge.rightFace !== floodface) {
+      deleteFace(topo, edge.rightFace)
+    }
+    if (edge.leftFace !== floodface) {
+      deleteFace(topo, edge.leftFace)
+    }
+  }
+
+  return modFace ? floodface : newface
+}
+
+function deleteFace (topo, face) {
+  // topo.facesTree.remove(face)
+  delete topo.faces[topo.faces.indexOf(face)]
 }
 
 export function remEdgeNewFaces (topo, edge) {

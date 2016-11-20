@@ -138,6 +138,7 @@ export function distance (c, cs) {
 }
 
 export function pointInPoly (c, shell) {
+  // return calcWindingNumber(c, shell) !== 0
   const point = toPoint(c)
   const polygon = toPolygon(shell)
   return RelateOp.contains(polygon, point)
@@ -150,15 +151,21 @@ export function calcWindingNumber (c, shell) {
     if (va[1] <= c[1]) {
       const vb = shell[i + 1]
       if (vb[1] > c[1]) {
-        if (isLeft(va, vb, c) > 0) {
+        const l = isLeft(va, vb, c)
+        if (l > 0) {
           wn++
+        } else if (l === 0) {
+          return 0
         }
       }
     } else {
       const vb = shell[i + 1]
       if (vb[1] <= c[1]) {
-        if (isLeft(va, vb, c) < 0) {
+        const l = isLeft(va, vb, c)
+        if (l < 0) {
           wn--
+        } else if (l === 0) {
+          return 0
         }
       }
     }
