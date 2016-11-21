@@ -242,15 +242,29 @@ describe('edge', () => {
   })
 
   describe('remEdgeNewFaces', () => {
-    it('should split two edges and one face into five edges and two faces', () => {
+    it('should be able to remove a single edge/face', () => {
       const node = addIsoNode(topology, [0, 0])
       const edge = addEdgeNewFaces(topology, node, node, [[0, 0], [0, 1], [1, 1], [0, 0]]).edge
-      remEdgeNewFaces(topology, edge)
-
-      // topology.edges.forEach(e => console.log(e2s(e)))
-      // console.log(topology.edges.length)
-
       expect(e2s(edge)).to.be('1|1|1|1|-1|0|1')
+      remEdgeNewFaces(topology, edge)
+      expect(e2s(edge)).to.be('1|1|1|1|-1|0|0')
+    })
+
+    it('should be able to remove a single edge and merge tree faces into two', () => {
+      const node1 = addIsoNode(topology, [0, 0])
+      const node2 = addIsoNode(topology, [1, 1])
+      const edge1 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [0, 1], [1, 1]]).edge
+      const edge2 = addEdgeNewFaces(topology, node2, node1, [[1, 1], [1, 0], [0, 0]]).edge
+      const edge3 = addEdgeNewFaces(topology, node1, node2, [[0, 0], [1, 1]]).edge
+
+      expect(e2s(edge1)).to.be('1|1|2|2|3|0|3')
+      expect(e2s(edge2)).to.be('2|2|1|1|-3|0|2')
+      expect(e2s(edge3)).to.be('3|1|2|-1|-2|3|2')
+
+      remEdgeNewFaces(topology, edge3)
+
+      expect(e2s(edge1)).to.be('1|1|2|2|3|0|5')
+      expect(e2s(edge2)).to.be('2|2|1|1|-3|0|5')
     })
   })
 })

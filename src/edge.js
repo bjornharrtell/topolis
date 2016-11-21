@@ -1,7 +1,8 @@
 /** @module */
 
 import SpatialError from './SpatialError'
-import { isSimple, relate, equals, azimuth, split, distance } from './utils'
+import { isSimple, relate, equals, azimuth, split, distance, intersects } from './utils'
+import { insertEdge, deleteEdge, insertFace, deleteFace } from './topo'
 import { insertNode } from './node'
 import { addFaceSplit } from './face'
 
@@ -62,6 +63,23 @@ export function getEdgeByPoint (topo, c, tol) {
   } else {
     throw new Error('Unexpected number of edges found')
   }
+}
+
+export function getEdgesByLine (topo, cs) {
+  const xs = cs.map(c => c[0])
+  const ys = cs.map(c => c[1])
+
+  const bounds = {
+    minX: Math.min(...xs),
+    minY: Math.min(...ys),
+    maxX: Math.max(...xs),
+    maxY: Math.max(...ys)
+  }
+
+  const edges = topo.edgesTree.search(bounds)
+    .filter(e => intersects(cs, e.coordinates))
+
+  return edges
 }
 
 /**
@@ -261,19 +279,6 @@ function findAdjacentEdges (topo, node, data, other, edge) {
   }
 
   return edges
-}
-
-function insertEdge (topo, edge) {
-  const { edges, edgesTree } = topo
-  const xs = edge.coordinates.map(c => c[0])
-  const ys = edge.coordinates.map(c => c[1])
-  edge.id = edges.length + 1
-  edge.minX = Math.min(...xs)
-  edge.minY = Math.min(...ys)
-  edge.maxX = Math.max(...xs)
-  edge.maxY = Math.max(...ys)
-  edgesTree.insert(edge)
-  edges.push(edge)
 }
 
 function addEdge (topo, start, end, coordinates, modFace) {
@@ -531,119 +536,137 @@ export function addEdgeModFace (topo, start, end, coordinates) {
 function remEdge (topo, edge, modFace) {
   console.debug('Updating next_{right,left}_face of ring edges...')
 
-  const { universe, edges, edgesTree } = topo
+  const { universe, edges, nodes } = topo
+
+  const oldLeftFace = edge.leftFace
+  const oldRightFace = edge.rightFace
 
   const updEdge = getEdgeByNode(topo, edge.start)
   const updEdgeLeft = []
   const updEdgeRight = []
-  // const updNode = []
-  let nedgeLeft = 0
-  let nedgeRight = 0
-  // let fnodeEdges = 0
-  // let lnodeEdges = 0
+  let fnodeEdges = 0
+  let lnodeEdges = 0
 
   updEdge.forEach(e => {
     if (e === edge) {
       return
     }
-    if (e.start === edge.start || e.end === edge.end) {
-      // fnodeEdges++
+    if (e.start === edge.start || e.end === edge.start) {
+      fnodeEdges++
     }
-    if (e.start === edge.end || e.end === edge.start) {
-      // lnodeEdges++
+    if (e.start === edge.end || e.end === edge.end) {
+      lnodeEdges++
     }
     if (e.nextLeft === edge && !e.nextLeftDir) {
-      updEdgeLeft[nedgeLeft] = {
+      updEdgeLeft.push({
         edge: e,
-        nextLeft: edge.nextLeft === edge && edge.nextLeftDir ? edge.nextRight : edge.nextLeft
-      }
-      nedgeLeft++
+        nextLeft: edge.nextLeft !== edge && edge.nextLeftDir ? edge.nextLeft : edge.nextRight
+      })
     } else if (e.nextLeft === edge && e.nextLeftDir) {
-      updEdgeLeft[nedgeLeft] = {
+      updEdgeLeft.push({
         edge: e,
-        nextLeft: edge.nextRight === edge && !edge.nextLeftDir ? edge.nextLeft : edge.nextRight
-      }
-      nedgeLeft++
+        nextLeft: edge.nextRight !== edge && !edge.nextLeftDir ? edge.nextRight : edge.nextLeft
+      })
     }
 
     if (e.nextRight === edge && !e.nextRightDir) {
-      updEdgeRight[nedgeRight] = {
+      updEdgeRight.push({
         edge: e,
-        nextRight: edge.nextLeft === edge && edge.nextLeftDir ? edge.nextRight : edge.nextLeft
-      }
-      nedgeRight++
+        nextRight: edge.nextLeft !== edge && edge.nextLeftDir ? edge.nextLeft : edge.nextRight
+      })
     } else if (e.nextLeft === edge && e.nextLeftDir) {
-      updEdgeRight[nedgeRight] = {
+      updEdgeRight.push({
         edge: e,
-        nextRight: edge.nextRight === edge && !edge.nextLeftDir ? edge.nextLeft : edge.nextRight
-      }
-      nedgeRight++
+        nextRight: edge.nextRight !== edge && !edge.nextLeftDir ? edge.nextRight : edge.nextLeft
+      })
     }
   })
 
-  if (nedgeLeft) {
-    updEdgeLeft.forEach(ue => {
-      ue.edge.nextLeft = ue.nextLeft
-    })
-  }
+  updEdgeLeft.forEach(ue => {
+    ue.edge.nextLeft = ue.nextLeft
+  })
 
-  if (nedgeRight) {
-    updEdgeLeft.forEach(ue => {
-      ue.edge.nextRight = ue.nextRight
-    })
-  }
+  updEdgeLeft.forEach(ue => {
+    ue.edge.nextRight = ue.nextRight
+  })
 
   let floodface
-  let newface
+  let newface = { id: -1 }
 
-  if (edge.leftFace === edge.rightFace) {
-    floodface = edge.rightFace
+  if (oldLeftFace === oldRightFace) {
+    floodface = oldRightFace
   } else {
-    if (edge.leftFace.id === 0 || edge.rightFace.id === 0) {
+    if (oldLeftFace === universe || oldRightFace === universe) {
       floodface = universe
       console.debug('floodface is universe')
     } else {
-      floodface = edge.rightFace
+      floodface = oldRightFace
       console.debug('floodface is ' + floodface.id)
       // TODO: merge bboxes
       if (modFace) {
         newface = floodface
       } else {
-        // TODO: insert new face
-        // TODO: floodface = new face
+        insertFace(topo, newface)
+        floodface = newface
       }
     }
 
-    if (edge.leftFace !== floodface) {
-      // TODO: _lwt_UpdateEdgeFaceRef _lwt_UpdateNodeFaceRef
+    if (oldLeftFace !== floodface) {
+      console.debug(`Updating edges leftFace to ${floodface.id} where it was ${oldLeftFace.id}`)
+      edges
+        .filter(e => e.leftFace === oldLeftFace)
+        .forEach(e => (e.leftFace = floodface))
+      edges
+        .filter(e => e.rightFace === oldLeftFace)
+        .forEach(e => (e.rightFace = floodface))
+      nodes
+        .filter(n => n.face === oldLeftFace)
+        .forEach(n => (n.face = floodface))
     }
 
-    if (edge.rightFace !== floodface) {
-      // TODO: _lwt_UpdateEdgeFaceRef _lwt_UpdateNodeFaceRef
+    if (oldRightFace !== floodface) {
+      console.debug(`Updating edges rightFace to ${floodface.id} where it was ${oldRightFace.id}`)
+      edges
+        .filter(e => e.leftFace === oldRightFace)
+        .forEach(e => (e.leftFace = floodface))
+      edges
+        .filter(e => e.rightFace === oldRightFace)
+        .forEach(e => (e.rightFace = floodface))
+      nodes
+        .filter(n => n.face === oldRightFace)
+        .forEach(n => (n.face = floodface))
     }
   }
 
-  edgesTree.remove(edge)
-  delete edges[edges.indexOf(edge)]
+  deleteEdge(topo, edge)
 
-  // TODO: update nodes
+  if (!fnodeEdges) {
+    edge.start.face = floodface
+  }
+  if (edge.end !== edge.start && !lnodeEdges) {
+    edge.end.face = floodface
+  }
 
-  // FIXME: edge face refs changed here, need to save them before modification
-  if (edge.leftFace !== edge.rightFace) {
-    if (edge.rightFace !== floodface) {
-      deleteFace(topo, edge.rightFace)
+  let deletedFace
+  if (oldLeftFace !== oldRightFace) {
+    if (oldRightFace !== floodface) {
+      deletedFace = oldRightFace
     }
-    if (edge.leftFace !== floodface) {
-      deleteFace(topo, edge.leftFace)
+    if (oldLeftFace !== floodface) {
+      deletedFace = oldLeftFace
     }
   }
 
-  return modFace ? floodface : newface
-}
+  if (deletedFace) {
+    deleteFace(topo, deletedFace)
+  }
 
-function deleteFace (topo, face) {
-  // topo.facesTree.remove(face)
-  delete topo.faces[topo.faces.indexOf(face)]
+  const result = {
+    newFace: modFace ? floodface : newface,
+    deletedFace
+  }
+
+  return result
 }
 
 export function remEdgeNewFaces (topo, edge) {

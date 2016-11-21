@@ -46,6 +46,12 @@ export function relate (cs1, cs2) {
   return RelateOp.relate(ls1, ls2, BoundaryNodeRule.ENDPOINT_BOUNDARY_RULE)
 }
 
+export function intersects (cs1, cs2) {
+  const ls1 = toLineString(cs1)
+  const ls2 = toLineString(cs2)
+  return RelateOp.intersects(ls1, ls2)
+}
+
 export function equals (c1, c2) {
   return c1[0] === c2[0] && c1[1] === c2[1]
 }
@@ -112,6 +118,9 @@ export function polygonize (css) {
   const polygonizer = new Polygonizer()
   lss.forEach(ls => polygonizer.add(ls))
   const polys = polygonizer.getPolygons()
+  if (polys.size() === 0) {
+    throw new Error('Could not polygonize edges - invalid topology?')
+  }
   return polyToCoordss(polys.get(0))
 }
 

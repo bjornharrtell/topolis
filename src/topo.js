@@ -45,3 +45,33 @@ export function create (name, srid, tolerance) {
   }
   return topo
 }
+
+export function insertFace (topo, face) {
+  console.debug('topo.insertFace')
+  const { faces } = topo
+  face.id = faces.length + 1
+  faces.push(face)
+}
+
+export function insertEdge (topo, edge) {
+  const { edges, edgesTree } = topo
+  const xs = edge.coordinates.map(c => c[0])
+  const ys = edge.coordinates.map(c => c[1])
+  edge.id = edges.length + 1
+  edge.minX = Math.min(...xs)
+  edge.minY = Math.min(...ys)
+  edge.maxX = Math.max(...xs)
+  edge.maxY = Math.max(...ys)
+  edgesTree.insert(edge)
+  edges.push(edge)
+}
+
+export function deleteEdge (topo, edge) {
+  topo.edgesTree.remove(edge)
+  // delete edges[edges.indexOf(edge)]
+}
+
+export function deleteFace (topo, face) {
+  // topo.facesTree.remove(face)
+  // delete topo.faces[topo.faces.indexOf(face)]
+}
