@@ -56,13 +56,7 @@ export function getEdgeByPoint (topo, c, tol) {
 
   const candidates = result.filter(e => distance(c, e.coordinates) < tol)
 
-  if (candidates.length === 1) {
-    return candidates[0]
-  } else if (candidates.length === 0) {
-    return 0
-  } else {
-    throw new Error('Unexpected number of edges found')
-  }
+  return candidates
 }
 
 export function getEdgesByLine (topo, cs) {
@@ -496,8 +490,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
 
   let removedFace
   if (oldFace !== topo.universe && !modFace) {
-    delete topo.faces[topo.faces.indexOf(oldFace)]
-    topo.facesTree.remove(oldFace)
+    deleteFace(topo, oldFace)
     removedFace = oldFace
   }
 
@@ -560,34 +553,40 @@ function remEdge (topo, edge, modFace) {
     if (e.nextLeft === edge && !e.nextLeftDir) {
       updEdgeLeft.push({
         edge: e,
-        nextLeft: edge.nextLeft !== edge && edge.nextLeftDir ? edge.nextLeft : edge.nextRight
+        nextLeft: edge.nextLeft !== edge || !edge.nextLeftDir ? edge.nextLeft : edge.nextRight,
+        nextLeftDir: edge.nextLeft !== edge || !edge.nextLeftDir ? edge.nextLeftDir : edge.nextRightDir
       })
     } else if (e.nextLeft === edge && e.nextLeftDir) {
       updEdgeLeft.push({
         edge: e,
-        nextLeft: edge.nextRight !== edge && !edge.nextLeftDir ? edge.nextRight : edge.nextLeft
+        nextLeft: edge.nextRight !== edge || edge.nextRightDir ? edge.nextRight : edge.nextLeft,
+        nextLeftDir: edge.nextRight !== edge || edge.nextRightDir ? edge.nextRightDir : edge.nextLeftDir
       })
     }
 
     if (e.nextRight === edge && !e.nextRightDir) {
       updEdgeRight.push({
         edge: e,
-        nextRight: edge.nextLeft !== edge && edge.nextLeftDir ? edge.nextLeft : edge.nextRight
+        nextRight: edge.nextLeft !== edge || !edge.nextLeftDir ? edge.nextLeft : edge.nextRight,
+        nextRightDir: edge.nextLeft !== edge || !edge.nextLeftDir ? edge.nextLefttDir : edge.nextRightDir
       })
-    } else if (e.nextLeft === edge && e.nextLeftDir) {
+    } else if (e.nextRight === edge && e.nextRightDir) {
       updEdgeRight.push({
         edge: e,
-        nextRight: edge.nextRight !== edge && !edge.nextLeftDir ? edge.nextRight : edge.nextLeft
+        nextRight: edge.nextRight !== edge || edge.nextRightDir ? edge.nextRight : edge.nextLeft,
+        nextRightDir: edge.nextRight !== edge || edge.nextRightDir ? edge.nextRightDir : edge.nextLeftDir
       })
     }
   })
 
   updEdgeLeft.forEach(ue => {
     ue.edge.nextLeft = ue.nextLeft
+    ue.edge.nextLeftDir = ue.nextLeftDir
   })
 
-  updEdgeLeft.forEach(ue => {
+  updEdgeRight.forEach(ue => {
     ue.edge.nextRight = ue.nextRight
+    ue.edge.nextRightDir = ue.nextRightDir
   })
 
   let floodface
@@ -647,29 +646,27 @@ function remEdge (topo, edge, modFace) {
     edge.end.face = floodface
   }
 
-  let deletedFace
+  const deletedFaces = []
   if (oldLeftFace !== oldRightFace) {
     if (oldRightFace !== floodface) {
-      deletedFace = oldRightFace
+      deletedFaces.push(oldRightFace)
     }
     if (oldLeftFace !== floodface) {
-      deletedFace = oldLeftFace
+      deletedFaces.push(oldLeftFace)
     }
   }
 
-  if (deletedFace) {
-    deleteFace(topo, deletedFace)
-  }
+  deletedFaces.forEach(f => deleteFace(topo, f))
 
   const result = {
     newFace: modFace ? floodface : newface,
-    deletedFace
+    deletedFaces
   }
 
   return result
 }
 
-export function remEdgeNewFaces (topo, edge) {
+export function remEdgeNewFace (topo, edge) {
   return remEdge(topo, edge, false)
 }
 

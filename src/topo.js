@@ -47,9 +47,8 @@ export function create (name, srid, tolerance) {
 }
 
 export function insertFace (topo, face) {
-  console.debug('topo.insertFace')
   const { faces } = topo
-  face.id = faces.length + 1
+  face.id = faces.length
   faces.push(face)
 }
 
@@ -68,10 +67,10 @@ export function insertEdge (topo, edge) {
 
 export function deleteEdge (topo, edge) {
   topo.edgesTree.remove(edge)
-  // delete edges[edges.indexOf(edge)]
+  delete topo.edges[topo.edges.indexOf(edge)]
 }
 
 export function deleteFace (topo, face) {
   // topo.facesTree.remove(face)
-  // delete topo.faces[topo.faces.indexOf(face)]
+  delete topo.faces[topo.faces.indexOf(face)]
 }

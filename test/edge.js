@@ -2,7 +2,7 @@ import expect from 'expect.js'
 
 import { create as createTopology } from '../src/topo'
 import { addIsoNode } from '../src/node'
-import { e2s, addIsoEdge, addEdgeNewFaces, modEdgeSplit, remEdgeNewFaces } from '../src/edge'
+import { e2s, addIsoEdge, addEdgeNewFaces, modEdgeSplit, remEdgeNewFace } from '../src/edge'
 
 let topology
 
@@ -246,7 +246,7 @@ describe('edge', () => {
       const node = addIsoNode(topology, [0, 0])
       const edge = addEdgeNewFaces(topology, node, node, [[0, 0], [0, 1], [1, 1], [0, 0]]).edge
       expect(e2s(edge)).to.be('1|1|1|1|-1|0|1')
-      remEdgeNewFaces(topology, edge)
+      remEdgeNewFace(topology, edge)
       expect(e2s(edge)).to.be('1|1|1|1|-1|0|0')
     })
 
@@ -261,10 +261,24 @@ describe('edge', () => {
       expect(e2s(edge2)).to.be('2|2|1|1|-3|0|2')
       expect(e2s(edge3)).to.be('3|1|2|-1|-2|3|2')
 
-      remEdgeNewFaces(topology, edge3)
+      remEdgeNewFace(topology, edge3)
 
-      expect(e2s(edge1)).to.be('1|1|2|2|3|0|5')
-      expect(e2s(edge2)).to.be('2|2|1|1|-3|0|5')
+      // topology.edges.forEach(e => console.log(e2s(e)))
+      // topology.faces.forEach(f => console.log(f))
+
+      expect(e2s(edge1)).to.be('1|1|2|2|-2|0|4')
+      expect(e2s(edge2)).to.be('2|2|1|1|-1|0|4')
+
+      /* equivalent postgis topo
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
+      select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
+      select st_addedgenewfaces('topo5', 2, 1, ST_GeomFromText('LINESTRING(1 1, 1 0, 0 0)'));
+      select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 1 1)'));
+      select st_remedgenewface('topo5', 3);
+      */
     })
   })
 })
