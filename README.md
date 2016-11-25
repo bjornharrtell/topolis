@@ -1,4 +1,7 @@
-# topolis ![Logo](https://cdn.rawgit.com/bjornharrtell/topolis/master/logo.svg)
+|test|test|
+|-|-|
+|![Logo](https://cdn.rawgit.com/bjornharrtell/topolis/master/logo.svg)|Topolis|
+|-|-|
 
 [![Build Status](https://travis-ci.org/bjornharrtell/topolis.svg)](https://travis-ci.org/bjornharrtell/topolis)
 [![Coverage Status](https://coveralls.io/repos/github/bjornharrtell/topolis/badge.svg?branch=master)](https://coveralls.io/github/bjornharrtell/topolis?branch=master)
