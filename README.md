@@ -1,4 +1,4 @@
-# topolis
+# topolis ![Logo](logo.svg)
 
 [![Build Status](https://travis-ci.org/bjornharrtell/topolis.svg)](https://travis-ci.org/bjornharrtell/topolis)
 [![Coverage Status](https://coveralls.io/repos/github/bjornharrtell/topolis/badge.svg?branch=master)](https://coveralls.io/github/bjornharrtell/topolis?branch=master)
