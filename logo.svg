@@ -1,0 +1,30 @@
+<svg xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://www.w3.org/2000/svg" height="169.22" width="203.88" version="1.1" xmlns:cc="http://creativecommons.org/ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" viewBox="0 0 203.87506 169.21503">
+	<g transform="translate(-1041.2 -743.02)" stroke="#000" fill="none">
+		<path stroke-linejoin="round" d="m1243.5 876.23-181.1-4.28" stroke-linecap="round" stroke-dasharray="12, 12" stroke-width="3"/>
+		<g>
+			<path stroke-linejoin="round" d="m1062.4 871.95 91.541-127.41" stroke-linecap="round" stroke-width="3"/>
+			<path stroke-linejoin="round" d="m1153.9 744.53 89.575 131.7" stroke-linecap="round" stroke-width="3"/>
+			<g stroke-width="2">
+				<path d="m1133.3 812.33c-13.534 40.051 45.575 20.992 14.363-0.82864"/>
+				<path d="m1138.3 773.66c9.3913 6.0767 23.202-2.7621 24.859-4.1432"/>
+				<path d="m1191.3 869.23c0.2762-10.496 11.601-24.859 19.059-31.488"/>
+				<path d="m1099.6 880.56c-4.9718 20.992-43.642 32.317-57.452 18.506"/>
+				<path d="m1091.3 842.99c8.0102 4.1432 16.02 9.6675 14.087 24.307"/>
+			</g>
+			<g stroke-linejoin="round" stroke-linecap="round" stroke-width="2">
+				<path d="m1110.1 862.88-4.6956 4.4194-4.9719-4.4194"/>
+				<path d="m1052.6 898.23-10.496 0.82864v12.153"/>
+				<path d="m1147.7 811.5-1.1049 9.115"/>
+				<path d="m1147.7 811.5 9.115-0.55242"/>
+				<path d="m1199.9 838.02 10.496-0.27622v8.5626"/>
+				<path d="m1143.8 772.56-5.5243 1.1048 2.7621 6.6291"/>
+				<path d="m1192.1 800.66 2.5148-7.1128"/>
+				<path d="m1124.4 785.67-9.5775 0.41867"/>
+				<path d="m1172.2 874.55-6.6211-7.7989"/>
+				<path d="m1192.1 800.66-7.9814-1.3124"/>
+				<path d="m1124.4 785.67 3.1284 7.8764"/>
+				<path d="m1172.2 874.55-6.6211 7.1166"/>
+			</g>
+		</g>
+	</g>
+</svg>
