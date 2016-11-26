@@ -52,8 +52,6 @@ export function addIsoNode (topo, coordinate) {
 
   const containingFaces = getFaceByPoint(topo, coordinate, 0)
 
-  console.log(containingFaces)
-
   const node = {
     id: topo.nodesSeq,
     face: containingFaces.length === 0 ? faces[0] : containingFaces[0],

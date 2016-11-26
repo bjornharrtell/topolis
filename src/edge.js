@@ -669,8 +669,10 @@ function remEdge (topo, edge, modFace) {
   deletedFaces.forEach(f => { deleteFace(topo, f); trigger(topo, 'removeface', f) })
 
   trigger(topo, 'removeedge', edge)
-  facesTree.remove(newface)
-  updateFaceTree(topo, newface)
+  if (newface.id !== -1) {
+    facesTree.remove(newface)
+    updateFaceTree(topo, newface)
+  }
   trigger(topo, 'addface', newface)
 
   return modFace ? floodface : newface
