@@ -320,7 +320,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
   const nodes = start !== end ? [start, end] : [start]
 
   nodes.forEach(node => {
-    if (node.face.id !== -1) {
+    if (node.face) {
       if (edge.leftFace.id === -1) {
         edge.leftFace = edge.rightFace = node.face
       } else if (edge.leftFace !== node.face) {
@@ -447,10 +447,10 @@ function addEdge (topo, start, end, coordinates, modFace) {
   }
 
   if (span.wasIsolated) {
-    start.face = { id: -1 }
+    delete start.face
   }
   if (epan.wasIsolated) {
-    end.face = { id: -1 }
+    delete end.face
   }
 
   if (!isClosed && (epan.wasIsolated || span.wasIsolated)) {
@@ -483,6 +483,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
     if (newface < 0) {
       newface = addFaceSplit(topo, edge, false, edge.leftFace, false)
       if (newface < 0) {
+        trigger(topo, 'addedge', edge)
         return edge
       }
     } else {
@@ -699,7 +700,6 @@ export function modEdgeSplit (topo, edge, coordinate) {
   const splitCoordinate = parts[0][parts[0].length - 1]
 
   const node = {
-    face: { id: -1 },
     coordinate: splitCoordinate
   }
 

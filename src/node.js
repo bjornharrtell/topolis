@@ -1,6 +1,6 @@
 /** @module */
 
-import { insertNode, trigger } from './topo'
+import { insertNode, deleteNode, trigger } from './topo'
 import SpatialError from './SpatialError'
 
 /**
@@ -31,7 +31,7 @@ export function getNodeByPoint (topo, coordinate) {
     maxY: coordinate[1]
   })
   if (result.length === 0) {
-    return 0
+    return
   }
   if (result.length === 1) {
     return result[0]
@@ -69,4 +69,12 @@ export function addIsoNode (topo, coordinate) {
   } else {
     throw new SpatialError('coincident node')
   }
+}
+
+export function removeIsoNode (topo, node) {
+  if (!node.face) {
+    throw new SpatialError('not isolated node')
+  }
+  deleteNode(topo, node)
+  trigger(topo, 'removenode', node)
 }

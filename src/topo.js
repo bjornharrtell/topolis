@@ -51,6 +51,7 @@ export function createTopology (name, srid, tolerance) {
     universe,
     getNodeByPoint: (...args) => node.getNodeByPoint(topo, ...args),
     addIsoNode: (...args) => node.addIsoNode(topo, ...args),
+    removeIsoNode: (...args) => node.removeIsoNode(topo, ...args),
     getEdgeByPoint: (...args) => edge.getEdgeByPoint(topo, ...args),
     getEdgesByLine: (...args) => edge.getEdgesByLine(topo, ...args),
     addIsoEdge: (...args) => edge.addIsoEdge(topo, ...args),
