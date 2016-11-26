@@ -8,7 +8,7 @@ import * as face from './face'
 import { getFaceGeometry } from './face'
 
 /**
- * Topo definition
+ * Topology structure
  *
  * @typedef {Object} Topo
  * @property {module:node~Node[]} nodes
@@ -18,6 +18,22 @@ import { getFaceGeometry } from './face'
  * @property {module:face~Face[]} faces
  * @property {Object} facesTree
  * @property {module:face~Face} universe
+ * @property {function} getNodeByPoint Calls {@link module:node.getNodeByPoint} in the context of this object
+ * @property {function} addIsoNode Calls {@link module:node.addIsoNode} in the context of this object
+ * @property {function} removeIsoNode Calls {@link module:node.removeIsoNode} in the context of this object
+ * @property {function} getEdgeByPoint Calls {@link module:edge.getEdgeByPoint} in the context of this object
+ * @property {function} getEdgesByLine Calls {@link module:edge.getEdgesByLine} in the context of this object
+ * @property {function} addIsoEdge Calls {@link module:edge.addIsoEdge} in the context of this object
+ * @property {function} addEdgeNewFaces Calls {@link module:edge.addEdgeNewFaces} in the context of this object
+ * @property {function} addEdgeModFace Calls {@link module:edge.addEdgeModFace} in the context of this object
+ * @property {function} remEdgeNewFace Calls {@link module:edge.remEdgeNewFace} in the context of this object
+ * @property {function} remEdgeModFace Calls {@link module:edge.remEdgeModFace} in the context of this object
+ * @property {function} newEdgesSplit Calls {@link module:edge.newEdgesSplit} in the context of this object
+ * @property {function} modEdgeSplit Calls {@link module:edge.modEdgeSplit} in the context of this object
+ * @property {function} newEdgeHeal Calls {@link module:edge.newEdgeHeal} in the context of this object
+ * @property {function} modEdgeHeal Calls {@link module:edge.modEdgeHeal} in the context of this object
+ * @property {function} getRingEdges Calls {@link module:face.getRingEdges} in the context of this object
+ * @property {function} getFaceGeometry Calls {@link module:face.getFaceGeometry} in the context of this object
  */
 
 /**

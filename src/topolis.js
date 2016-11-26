@@ -3,4 +3,9 @@
  * @module
  */
 
-export { createTopology } from './topo'
+export {
+  /**
+   * @type {module:topo.createTopology}
+   */
+  createTopology
+} from './topo'
