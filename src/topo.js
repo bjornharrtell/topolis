@@ -5,6 +5,7 @@ import rbush from 'rbush'
 import * as node from './node'
 import * as edge from './edge'
 import * as face from './face'
+import { getFaceGeometry } from './face'
 
 /**
  * Topo definition
@@ -64,7 +65,7 @@ export function createTopology (name, srid, tolerance) {
     newEdgeHeal: (...args) => edge.newEdgeHeal(topo, ...args),
     modEdgeHeal: (...args) => edge.modEdgeHeal(topo, ...args),
     getRingEdges: (...args) => face.getRingEdges(topo, ...args),
-    getFaceGeometry: (...args) => face.getFaceGeometry(topo, ...args),
+    getFaceGeometry: (...args) => getFaceGeometry(topo, ...args),
     observers: {
       'addface': [],
       'modface': [],
@@ -99,11 +100,23 @@ export function insertFace (topo, face) {
   faces.push(face)
 }
 
+export function updateFaceTree (topo, face) {
+  const { facesTree } = topo
+  const coordinates = getFaceGeometry(topo, face)
+  const xs = coordinates[0].map(c => c[0])
+  const ys = coordinates[0].map(c => c[1])
+  face.minX = Math.min(...xs)
+  face.minY = Math.min(...ys)
+  face.maxX = Math.max(...xs)
+  face.maxY = Math.max(...ys)
+  facesTree.insert(face)
+}
+
 export function deleteFace (topo, face) {
-  const { faces } = topo
-  // topo.facesTree.remove(face)
-  delete faces[faces.indexOf(face)]
-  // faces.splice(faces.indexOf(face), 1)
+  const { faces, facesTree } = topo
+  facesTree.remove(face)
+  // delete faces[faces.indexOf(face)]
+  faces.splice(faces.indexOf(face), 1)
 }
 
 export function insertEdge (topo, edge) {

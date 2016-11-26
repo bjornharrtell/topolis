@@ -1,7 +1,7 @@
 /** @module */
 
 import { signedArea, pointInPoly, polygonize } from './utils'
-import { insertFace, trigger } from './topo'
+import { insertFace, updateFaceTree, trigger } from './topo'
 import { sid } from './edge'
 
 /**
@@ -14,6 +14,29 @@ import { sid } from './edge'
 function getNodeByFace (topo, face) {
   // TODO: only within face mbr
   return topo.nodes.filter(n => n.face === face)
+}
+
+export function getFaceByPoint (topo, c, tol) {
+  const result = topo.facesTree.search({
+    minX: c[0] - tol,
+    minY: c[1] - tol,
+    maxX: c[0] + tol,
+    maxY: c[1] + tol
+  })
+
+  const fs = result
+    .map(f => ({
+      f,
+      s: getFaceGeometry(topo, f)[0]
+    }))
+
+  const candidates = fs
+    .filter(fs => pointInPoly(c, fs.s))
+    .map(fs => fs.f)
+
+  // TODO: throw exception on more than one candidate?
+
+  return candidates
 }
 
 /**
@@ -207,6 +230,7 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
   })
 
   insertFace(topo, newFace)
+  updateFaceTree(topo, newFace)
 
   trigger(topo, 'addface', newFace)
 

@@ -2,7 +2,7 @@
 
 import SpatialError from './SpatialError'
 import { isSimple, relate, equals, azimuth, split, distance, intersects } from './utils'
-import { insertNode, insertEdge, deleteEdge, insertFace, deleteFace, trigger } from './topo'
+import { insertNode, insertEdge, deleteEdge, insertFace, updateFaceTree, deleteFace, trigger } from './topo'
 import { addFaceSplit } from './face'
 
 /**
@@ -54,6 +54,8 @@ export function getEdgeByPoint (topo, c, tol) {
   })
 
   const candidates = result.filter(e => distance(c, e.coordinates) < tol)
+
+  // TODO: throw exception on more than one candidate?
 
   return candidates
 }
@@ -530,7 +532,7 @@ export function addEdgeModFace (topo, start, end, coordinates) {
 function remEdge (topo, edge, modFace) {
   console.debug('Updating next_{right,left}_face of ring edges...')
 
-  const { universe, edges, nodes } = topo
+  const { universe, edges, nodes, facesTree } = topo
 
   const oldLeftFace = edge.leftFace
   const oldRightFace = edge.rightFace
@@ -667,6 +669,8 @@ function remEdge (topo, edge, modFace) {
   deletedFaces.forEach(f => { deleteFace(topo, f); trigger(topo, 'removeface', f) })
 
   trigger(topo, 'removeedge', edge)
+  facesTree.remove(newface)
+  updateFaceTree(topo, newface)
   trigger(topo, 'addface', newface)
 
   return modFace ? floodface : newface

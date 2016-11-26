@@ -1,6 +1,7 @@
 /** @module */
 
 import { insertNode, deleteNode, trigger } from './topo'
+import { getFaceByPoint } from './face'
 import SpatialError from './SpatialError'
 
 /**
@@ -49,12 +50,13 @@ export function getNodeByPoint (topo, coordinate) {
 export function addIsoNode (topo, coordinate) {
   const { nodesTree: tree, faces } = topo
 
-  // TODO: determine true face
-  const face = faces[0]
+  const containingFaces = getFaceByPoint(topo, coordinate, 0)
+
+  console.log(containingFaces)
 
   const node = {
     id: topo.nodesSeq,
-    face,
+    face: containingFaces.length === 0 ? faces[0] : containingFaces[0],
     coordinate,
     minX: coordinate[0],
     minY: coordinate[1],
