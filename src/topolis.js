@@ -3,6 +3,8 @@
  * @module
  */
 
+import './Array'
+
 export {
   /**
    * @type {module:topo.createTopology}
