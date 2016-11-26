@@ -48,8 +48,8 @@ describe('edge', () => {
         topo.addIsoEdge(start2, end2, [[0, 1], [1, 0]])
       }).to.throwException(/^geometry crosses edge 1$/)
       /* equivalent postgis topo
-      select droptopo('topo5');
-      select createtopo('topo5', 0, 0);
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
       select st_addisoedge('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 1 1)'));
@@ -68,8 +68,8 @@ describe('edge', () => {
       expect(e2s(edge)).to.be('1|1|1|1|-1|0|1')
 
       /* equivalent postgis topo
-      select droptopo('topo4');
-      select createtopo('topo4', 0, 0);
+      select droptopology('topo4');
+      select createtopology('topo4', 0, 0);
       select st_addisonode('topo4', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addedgenewfaces('topo4', 1, 1, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1, 0 0)'));
       */
@@ -85,8 +85,8 @@ describe('edge', () => {
       expect(e2s(edge2)).to.be('2|2|1|1|-1|0|1')
 
       /* equivalent postgis topo
-      select droptopo('topo5');
-      select createtopo('topo5', 0, 0);
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
@@ -106,8 +106,8 @@ describe('edge', () => {
       expect(e2s(edge3)).to.be('3|1|2|-1|-2|3|2')
 
       /* equivalent postgis topo
-      select droptopo('topo5');
-      select createtopo('topo5', 0, 0);
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
@@ -136,8 +136,8 @@ describe('edge', () => {
       expect(e2s(edge6)).to.be('6|1|2|-1|5|5|4')
 
       /* equivalent postgis topo
-      select droptopo('topo5');
-      select createtopo('topo5', 0, 0);
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 1)'));
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
@@ -160,8 +160,8 @@ describe('edge', () => {
       expect(e2s(edge2)).to.be('2|1|1|1|-2|0|2')
 
       /*
-      select droptopo('topo5');
-      select createtopo('topo5', 0, 0);
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addedgenewfaces('topo5', 1, 1, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1, 0 0)'));
       select st_addedgenewfaces('topo5', 1, 1, ST_GeomFromText('LINESTRING(0 0, 0 -1, -1 -1, 0 0)'));
@@ -186,8 +186,8 @@ describe('edge', () => {
       expect(node3.coordinate).to.eql([0.5, 0.5])
 
       /* equivalent postgis topo
-      select droptopo('topo5');
-      select createtopo('topo5', 0, 0);
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
@@ -227,8 +227,8 @@ describe('edge', () => {
       */
 
       /* equivalent postgis topo
-      select droptopo('topo5');
-      select createtopo('topo5', 0, 0);
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
@@ -269,14 +269,77 @@ describe('edge', () => {
       expect(e2s(edge2)).to.be('2|2|1|1|-1|0|4')
 
       /* equivalent postgis topo
-      select droptopo('topo5');
-      select createtopo('topo5', 0, 0);
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
       select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
       select st_addedgenewfaces('topo5', 2, 1, ST_GeomFromText('LINESTRING(1 1, 1 0, 0 0)'));
       select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 1 1)'));
       select st_remedgenewface('topo5', 3);
+      */
+    })
+
+    it('should be able to ...', () => {
+      const node1 = topo.addIsoNode([0, 0])
+      const node2 = topo.addIsoNode([1, 1])
+      const edge1 = topo.addEdgeNewFaces(node1, node2, [[0, 0], [0, 1], [1, 1]])
+      const edge2 = topo.addEdgeNewFaces(node2, node1, [[1, 1], [1, 0], [0, 0]])
+      const node3 = topo.modEdgeSplit(edge1, [0.5, 1])
+      const edge3 = edge1.nextLeft
+      const node4 = topo.modEdgeSplit(edge2, [0.5, 0])
+      const edge4 = edge2.nextLeft
+      const edge5 = topo.addEdgeNewFaces(node3, node4, [[0.5, 1], [0.5, 0]])
+
+      expect(e2s(edge1)).to.be('1|1|3|3|-4|0|2')
+      expect(e2s(edge2)).to.be('2|2|4|4|-3|0|3')
+      expect(e2s(edge3)).to.be('3|3|2|2|5|0|3')
+      expect(e2s(edge4)).to.be('4|4|1|1|-5|0|2')
+      expect(e2s(edge5)).to.be('5|3|4|-2|-1|3|2')
+
+      topo.remEdgeNewFace(edge5)
+
+      expect(e2s(edge1)).to.be('1|1|3|3|-4|0|4')
+      expect(e2s(edge2)).to.be('2|2|4|4|-3|0|4')
+      expect(e2s(edge3)).to.be('3|3|2|2|-1|0|4')
+      expect(e2s(edge4)).to.be('4|4|1|1|-2|0|4')
+
+      const node5 = topo.modEdgeSplit(edge1, [0, 1])
+      const edge6 = edge1.nextLeft
+
+      expect(e2s(edge1)).to.be('1|1|5|6|-4|0|4')
+      expect(e2s(edge2)).to.be('2|2|4|4|-3|0|4')
+
+      const node6 = topo.modEdgeSplit(edge2, [1, 0])
+      const edge7 = edge2.nextLeft
+
+      expect(e2s(edge1)).to.be('1|1|5|6|-4|0|4')
+      expect(e2s(edge2)).to.be('2|2|6|7|-3|0|4')
+
+      const edge8 = topo.addEdgeNewFaces(node5, node6, [[0, 1], [1, 0]])
+
+      expect(e2s(edge1)).to.be('1|1|5|6|-4|0|5')
+      expect(e2s(edge2)).to.be('2|2|6|7|-3|0|6')
+      expect(e2s(edge3)).to.be('3|3|2|2|-6|0|6')
+      expect(e2s(edge4)).to.be('4|4|1|1|-7|0|5')
+      expect(e2s(edge6)).to.be('6|5|3|3|8|0|6')
+      expect(e2s(edge7)).to.be('7|6|4|4|-8|0|5')
+      expect(e2s(edge8)).to.be('8|5|6|-2|-1|6|5')
+
+      /* equivalent postgis topo
+      select droptopology('topo5');
+      select createtopology('topo5', 0, 0);
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(0 0)'));
+      select st_addisonode('topo5', 0, ST_GeomFromText('POINT(1 1)'));
+      select st_addedgenewfaces('topo5', 1, 2, ST_GeomFromText('LINESTRING(0 0, 0 1, 1 1)'));
+      select st_addedgenewfaces('topo5', 2, 1, ST_GeomFromText('LINESTRING(1 1, 1 0, 0 0)'));
+      select st_modedgesplit('topo5', 1, ST_GeomFromText('POINT(0.5 1)'));
+      select st_modedgesplit('topo5', 2, ST_GeomFromText('POINT(0.5 0)'));
+      select st_addedgenewfaces('topo5', 3, 4, ST_GeomFromText('LINESTRING(0.5 1, 0.5 0)'));
+      select st_remedgenewface('topo5', 3);
+      select st_modedgesplit('topo5', 1, ST_GeomFromText('POINT(0 1)'));
+      select st_modedgesplit('topo5', 2, ST_GeomFromText('POINT(1 0)'));
+      select st_addedgenewfaces('topo5', 5, 6, ST_GeomFromText('LINESTRING(0 1, 1 0)'));
       */
     })
   })

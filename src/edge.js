@@ -164,7 +164,11 @@ function checkEdgeCrossing (topo, start, end, edge) {
 }
 
 function getEdgeByNode (topo, node) {
-  return topo.edges.filter(e => e.start === node || e.end === node)
+  if (node.length) {
+    return topo.edges.filter(e => node.some(n => n === e.start) || node.some(n => n === e.end))
+  } else {
+    return topo.edges.filter(e => e.start === node || e.end === node)
+  }
 }
 
 function findAdjacentEdges (topo, node, data, other, edge) {
@@ -530,7 +534,12 @@ function remEdge (topo, edge, modFace) {
   const oldLeftFace = edge.leftFace
   const oldRightFace = edge.rightFace
 
-  const updEdge = getEdgeByNode(topo, edge.start)
+  const edgeNodes = []
+  edgeNodes.push(edge.start)
+  if (edge.end !== edge.start) {
+    edgeNodes.push(edge.end)
+  }
+  const updEdge = getEdgeByNode(topo, edgeNodes)
   const updEdgeLeft = []
   const updEdgeRight = []
   let fnodeEdges = 0
