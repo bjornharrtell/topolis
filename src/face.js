@@ -71,7 +71,6 @@ function getInteriorEdgePoint (coordinates) {
 export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
   console.debug(`addFaceSplit called on edge ${sid(edge, dir)} and face ${face.id}`)
 
-  const faces = topo.faces
   const universe = topo.faces[0]
 
   const sedges = getRingEdges(topo, edge, dir, 0)
@@ -92,7 +91,7 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
   console.debug(`Edge ${sid(edge, dir)} split face ${face.id} (mbr_only:${mbrOnly})`)
 
   const newFace = {
-    id: faces.length
+    id: topo.facesSeq
   }
 
   // const ringEdges = sedges.map(se => se.edge).filter((elem, pos, arr) => arr.indexOf(elem) === pos)

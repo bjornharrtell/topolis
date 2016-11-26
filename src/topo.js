@@ -40,10 +40,13 @@ export function createTopology (name, srid, tolerance) {
     srid,
     tolerance,
     nodes,
+    nodesSeq: 1,
     nodesTree,
     edges,
+    edgesSeq: 1,
     edgesTree,
     faces,
+    facesSeq: 1,
     facesTree,
     universe,
     getNodeByPoint: (...args) => node.getNodeByPoint(topo, ...args),
@@ -91,7 +94,7 @@ export function trigger (topo, name, e) {
 
 export function insertFace (topo, face) {
   const { faces } = topo
-  face.id = faces.length
+  face.id = topo.facesSeq++
   faces.push(face)
 }
 
@@ -106,7 +109,7 @@ export function insertEdge (topo, edge) {
   const { edges, edgesTree } = topo
   const xs = edge.coordinates.map(c => c[0])
   const ys = edge.coordinates.map(c => c[1])
-  edge.id = edges.length + 1
+  edge.id = topo.edgesSeq++
   edge.minX = Math.min(...xs)
   edge.minY = Math.min(...ys)
   edge.maxX = Math.max(...xs)
@@ -118,8 +121,8 @@ export function insertEdge (topo, edge) {
 export function deleteEdge (topo, edge) {
   const { edges, edgesTree } = topo
   edgesTree.remove(edge)
-  delete edges[edges.indexOf(edge)]
-  // edges.splice(edges.indexOf(edge), 1)
+  // delete edges[edges.indexOf(edge)]
+  edges.splice(edges.indexOf(edge), 1)
 }
 
 export function insertNode (topo, node) {
@@ -127,7 +130,7 @@ export function insertNode (topo, node) {
 
   const coordinate = node.coordinate
 
-  node.id = nodes.length + 1
+  node.id = topo.nodesSeq++
   node.minX = coordinate[0]
   node.minY = coordinate[1]
   node.maxX = coordinate[0]
@@ -140,6 +143,6 @@ export function insertNode (topo, node) {
 export function deleteNode (topo, node) {
   const { nodes, nodesTree } = topo
   nodesTree.remove(node)
-  delete nodes[nodes.indexOf(node)]
-  // nodes.splice(nodes.indexOf(node), 1)
+  // delete nodes[nodes.indexOf(node)]
+  nodes.splice(nodes.indexOf(node), 1)
 }

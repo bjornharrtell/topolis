@@ -85,13 +85,11 @@ export function getEdgesByLine (topo, cs) {
  * @return {module:edge~Edge}
  */
 export function addIsoEdge (topo, start, end, coordinates) {
-  const { edges } = topo
-
   const xs = coordinates.map(c => c[0])
   const ys = coordinates.map(c => c[1])
 
   const edge = {
-    id: edges.length + 1,
+    id: topo.edgesSeq,
     start,
     end,
     coordinates,
@@ -278,8 +276,6 @@ function findAdjacentEdges (topo, node, data, other, edge) {
 function addEdge (topo, start, end, coordinates, modFace) {
   console.debug('addEdge called')
 
-  const { edges } = topo
-
   if (!isSimple(coordinates)) {
     throw new SpatialError('curve not simple')
   }
@@ -288,7 +284,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
   const ys = coordinates.map(c => c[1])
 
   const edge = {
-    id: edges.length + 1,
+    id: topo.edgesSeq,
     start,
     end,
     coordinates,

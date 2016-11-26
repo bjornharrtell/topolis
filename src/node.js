@@ -47,13 +47,13 @@ export function getNodeByPoint (topo, coordinate) {
  * @return {module:node~Node}
  */
 export function addIsoNode (topo, coordinate) {
-  const { nodes, nodesTree: tree, faces } = topo
+  const { nodesTree: tree, faces } = topo
 
   // TODO: determine true face
   const face = faces[0]
 
   const node = {
-    id: nodes.length + 1,
+    id: topo.nodesSeq,
     face,
     coordinate,
     minX: coordinate[0],
