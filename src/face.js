@@ -1,6 +1,7 @@
 /** @module */
 
 import { signedArea, pointInPoly, polygonize } from './utils'
+import { insertFace } from './topo'
 import { sid } from './edge'
 
 /**
@@ -127,8 +128,6 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
     // TODO: newFace mbr shuld be shellbox
   }
 
-  topo.faces.push(newFace)
-
   const newFaceIsOutside = face !== universe && !isccw
 
   if (newFaceIsOutside) {
@@ -207,6 +206,8 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
     }
     n.face = newFace
   })
+
+  insertFace(topo, newFace)
 
   return newFace
 }

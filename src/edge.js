@@ -423,8 +423,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
     throw new Error('Could not derive edge face from linked primitives: invalid topo ?')
   }
 
-  edgesTree.insert(edge)
-  edges.push(edge)
+  insertEdge(topo, edge)
 
   if (prevLeft !== edge) {
     if (prevLeftDir) {
