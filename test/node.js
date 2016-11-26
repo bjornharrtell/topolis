@@ -1,25 +1,24 @@
 import expect from 'expect.js'
 
-import { create as createTopology } from '../src/topo'
-import { addIsoNode } from '../src/node'
+import { createTopology } from '../src/topo'
 
-let topology
+let topo
 
 beforeEach(() => {
-  topology = createTopology('test', 0, 0)
+  topo = createTopology('test', 0, 0)
 })
 
 describe('node', () => {
   describe('addIsoNode', () => {
     it('should be able to add a single node to an empty topology', () => {
-      const node = addIsoNode(topology, [0, 0])
+      const node = topo.addIsoNode([0, 0])
       expect(node).to.ok()
     })
     it('should refuse to add overlapping nodes to an empty topology', () => {
-      const node = addIsoNode(topology, [0, 0])
+      const node = topo.addIsoNode([0, 0])
       expect(node).to.ok()
       expect(() => {
-        addIsoNode(topology, [0, 0])
+        topo.addIsoNode([0, 0])
       }).to.throwException(/^coincident node$/)
     })
   })

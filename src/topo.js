@@ -2,6 +2,10 @@
 
 import rbush from 'rbush'
 
+import * as node from './node'
+import * as edge from './edge'
+import * as face from './face'
+
 /**
  * Topo definition
  *
@@ -23,7 +27,7 @@ import rbush from 'rbush'
  * @param {number} tolerance
  * @return {module:topo~Topo}
  */
-export function create (name, srid, tolerance) {
+export function createTopology (name, srid, tolerance) {
   const nodes = []
   const nodesTree = rbush(16)
   const edges = []
@@ -42,10 +46,25 @@ export function create (name, srid, tolerance) {
     faces,
     facesTree,
     universe,
+    getNodeByPoint: (...args) => node.getNodeByPoint(topo, ...args),
+    addIsoNode: (...args) => node.addIsoNode(topo, ...args),
+    addIsoEdge: (...args) => edge.addIsoEdge(topo, ...args),
+    addEdgeNewFaces: (...args) => edge.addEdgeNewFaces(topo, ...args),
+    addEdgeModFace: (...args) => edge.addEdgeModFace(topo, ...args),
+    remEdgeNewFace: (...args) => edge.remEdgeNewFace(topo, ...args),
+    remEdgeModFace: (...args) => edge.remEdgeModFace(topo, ...args),
+    newEdgesSplit: (...args) => edge.newEdgesSplit(topo, ...args),
+    modEdgeSplit: (...args) => edge.modEdgeSplit(topo, ...args),
+    newEdgeHeal: (...args) => edge.newEdgeHeal(topo, ...args),
+    modEdgeHeal: (...args) => edge.modEdgeHeal(topo, ...args),
+    getRingEdges: (...args) => face.getRingEdges(topo, ...args),
+    getFaceGeometry: (...args) => face.getFaceGeometry(topo, ...args),
     observers: {
       'addface': [],
+      'modface': [],
       'removeface': [],
       'addedge': [],
+      'modedge': [],
       'removeedge': [],
       'addnode': [],
       'removenode': []
@@ -64,7 +83,7 @@ export function un (topo, name, callback) {
   topo.observers[name].splice(i, 1)
 }
 
-function trigger (topo, name, e) {
+export function trigger (topo, name, e) {
   topo.observers[name].forEach(o => o(e))
 }
 
@@ -76,8 +95,10 @@ export function insertFace (topo, face) {
 }
 
 export function deleteFace (topo, face) {
+  const { faces } = topo
   // topo.facesTree.remove(face)
-  delete topo.faces[topo.faces.indexOf(face)]
+  delete faces[faces.indexOf(face)]
+  // faces.splice(faces.indexOf(face), 1)
   trigger(topo, 'removeface', face)
 }
 
@@ -96,8 +117,10 @@ export function insertEdge (topo, edge) {
 }
 
 export function deleteEdge (topo, edge) {
-  topo.edgesTree.remove(edge)
-  delete topo.edges[topo.edges.indexOf(edge)]
+  const { edges, edgesTree } = topo
+  edgesTree.remove(edge)
+  delete edges[edges.indexOf(edge)]
+  // edges.splice(edges.indexOf(edge), 1)
   trigger(topo, 'removeedge', edge)
 }
 
@@ -118,7 +141,9 @@ export function insertNode (topo, node) {
 }
 
 export function deleteNode (topo, node) {
-  topo.nodesTree.remove(node)
-  delete topo.nodes[topo.nodes.indexOf(node)]
+  const { nodes, nodesTree } = topo
+  nodesTree.remove(node)
+  delete nodes[nodes.indexOf(node)]
+  // nodes.splice(nodes.indexOf(node), 1)
   trigger(topo, 'removenode', node)
 }

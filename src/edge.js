@@ -2,7 +2,7 @@
 
 import SpatialError from './SpatialError'
 import { isSimple, relate, equals, azimuth, split, distance, intersects } from './utils'
-import { insertNode, insertEdge, deleteEdge, insertFace, deleteFace } from './topo'
+import { insertNode, insertEdge, deleteEdge, insertFace, deleteFace, trigger } from './topo'
 import { addFaceSplit } from './face'
 
 /**
@@ -140,8 +140,7 @@ export function addIsoEdge (topo, start, end, coordinates) {
   delete start.face
   delete end.face
 
-  edgesTree.insert(edge)
-  edges.push(edge)
+  insertEdge(topo, edge)
   return edge
 }
 
@@ -277,7 +276,7 @@ function findAdjacentEdges (topo, node, data, other, edge) {
 function addEdge (topo, start, end, coordinates, modFace) {
   console.debug('addEdge called')
 
-  const { edges, edgesTree } = topo
+  const { edges } = topo
 
   if (!isSimple(coordinates)) {
     throw new SpatialError('curve not simple')
@@ -453,7 +452,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
   }
 
   if (!isClosed && (epan.wasIsolated || span.wasIsolated)) {
-    return { edge }
+    return edge
   }
 
   const oldFace = edge.leftFace
@@ -464,7 +463,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
     newface1 = addFaceSplit(topo, edge, false, edge.leftFace, false)
     if (newface1 === 0) {
       console.debug('New edge does not split any face')
-      return { edge }
+      return edge
     }
   }
 
@@ -473,29 +472,24 @@ function addEdge (topo, start, end, coordinates, modFace) {
   if (modFace) {
     if (newface === 0) {
       console.debug('New edge does not split any face')
-      return { edge }
+      return edge
     }
 
     if (newface < 0) {
       newface = addFaceSplit(topo, edge, false, edge.leftFace, false)
       if (newface < 0) {
-        return { edge }
+        return edge
       }
     } else {
       addFaceSplit(topo, edge, false, edge.leftFace, true)
     }
   }
 
-  let removedFace
   if (oldFace !== topo.universe && !modFace) {
     deleteFace(topo, oldFace)
-    removedFace = oldFace
   }
 
-  return {
-    edge,
-    removedFace
-  }
+  return edge
 }
 
 /**
@@ -656,12 +650,7 @@ function remEdge (topo, edge, modFace) {
 
   deletedFaces.forEach(f => deleteFace(topo, f))
 
-  const result = {
-    newFace: modFace ? floodface : newface,
-    deletedFaces
-  }
-
-  return result
+  return modFace ? floodface : newface
 }
 
 export function remEdgeNewFace (topo, edge) {
@@ -734,6 +723,8 @@ export function modEdgeSplit (topo, edge, coordinate) {
   edges
     .filter(e => e.nextLeft === edge && !e.nextLeftDir && e.end === oldEnd && e !== newedge1)
     .forEach(e => { e.nextLeft = newedge1; e.nextLeftDir = false })
+
+  trigger(topo, 'modedge', edge)
 
   return node
 }
