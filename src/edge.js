@@ -2,8 +2,7 @@
 
 import SpatialError from './SpatialError'
 import { isSimple, relate, equals, azimuth, split, distance, intersects } from './utils'
-import { insertEdge, deleteEdge, insertFace, deleteFace } from './topo'
-import { insertNode } from './node'
+import { insertNode, insertEdge, deleteEdge, insertFace, deleteFace } from './topo'
 import { addFaceSplit } from './face'
 
 /**

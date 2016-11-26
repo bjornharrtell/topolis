@@ -41,15 +41,43 @@ export function create (name, srid, tolerance) {
     edgesTree,
     faces,
     facesTree,
-    universe
+    universe,
+    observers: {
+      'addface': [],
+      'removeface': [],
+      'addedge': [],
+      'removeedge': [],
+      'addnode': [],
+      'removenode': []
+    }
   }
   return topo
+}
+
+export function on (topo, name, callback) {
+  topo.observers[name].push(callback)
+}
+
+export function un (topo, name, callback) {
+  const i = topo.observers[name].indexOf(callback)
+  topo.observers[name].splice(i, 1)
+}
+
+function trigger (topo, name, e) {
+  topo.observers[name].forEach(o => o(e))
 }
 
 export function insertFace (topo, face) {
   const { faces } = topo
   face.id = faces.length
   faces.push(face)
+  trigger(topo, 'addface', face)
+}
+
+export function deleteFace (topo, face) {
+  // topo.facesTree.remove(face)
+  delete topo.faces[topo.faces.indexOf(face)]
+  trigger(topo, 'removeface', face)
 }
 
 export function insertEdge (topo, edge) {
@@ -63,14 +91,33 @@ export function insertEdge (topo, edge) {
   edge.maxY = Math.max(...ys)
   edgesTree.insert(edge)
   edges.push(edge)
+  trigger(topo, 'addedge', edge)
 }
 
 export function deleteEdge (topo, edge) {
   topo.edgesTree.remove(edge)
   delete topo.edges[topo.edges.indexOf(edge)]
+  trigger(topo, 'removeedge', edge)
 }
 
-export function deleteFace (topo, face) {
-  // topo.facesTree.remove(face)
-  delete topo.faces[topo.faces.indexOf(face)]
+export function insertNode (topo, node) {
+  const { nodes, nodesTree } = topo
+
+  const coordinate = node.coordinate
+
+  node.id = nodes.length + 1
+  node.minX = coordinate[0]
+  node.minY = coordinate[1]
+  node.maxX = coordinate[0]
+  node.maxY = coordinate[1]
+
+  nodesTree.insert(node)
+  nodes.push(node)
+  trigger(topo, 'addnode', node)
+}
+
+export function deleteNode (topo, node) {
+  topo.nodesTree.remove(node)
+  delete topo.nodes[topo.nodes.indexOf(node)]
+  trigger(topo, 'removenode', node)
 }

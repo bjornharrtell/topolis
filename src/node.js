@@ -1,5 +1,6 @@
 /** @module */
 
+import { insertNode } from './topo'
 import SpatialError from './SpatialError'
 
 /**
@@ -38,21 +39,6 @@ export function getNodeByPoint (topo, coordinate) {
   throw Error('getNodeByPoint: unexpected search result')
 }
 
-export function insertNode (topo, node) {
-  const { nodes, nodesTree } = topo
-
-  const coordinate = node.coordinate
-
-  node.id = nodes.length + 1
-  node.minX = coordinate[0]
-  node.minY = coordinate[1]
-  node.maxX = coordinate[0]
-  node.maxY = coordinate[1]
-
-  nodesTree.insert(node)
-  nodes.push(node)
-}
-
 /**
  * Adds an isolated node to a face in a topology and returns the new node. If face is null, the node is still created.
  *
@@ -77,8 +63,7 @@ export function addIsoNode (topo, coordinate) {
   }
 
   if (!tree.collides(node)) {
-    tree.insert(node)
-    nodes.push(node)
+    insertNode(topo, node)
     return node
   } else {
     throw new SpatialError('coincident node')
