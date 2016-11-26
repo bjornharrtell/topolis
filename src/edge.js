@@ -743,6 +743,7 @@ export function modEdgeSplit (topo, edge, coordinate) {
     .forEach(e => { e.nextLeft = newedge1; e.nextLeftDir = false })
 
   trigger(topo, 'addnode', node)
+  trigger(topo, 'addedge', newedge1)
   trigger(topo, 'modedge', edge)
 
   return node
