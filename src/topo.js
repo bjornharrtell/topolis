@@ -49,7 +49,8 @@ export function create (name, srid, tolerance) {
       'removeedge': [],
       'addnode': [],
       'removenode': []
-    }
+    },
+    on: (...args) => on(topo, ...args)
   }
   return topo
 }
