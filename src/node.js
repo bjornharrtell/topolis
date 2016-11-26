@@ -1,6 +1,6 @@
 /** @module */
 
-import { insertNode } from './topo'
+import { insertNode, trigger } from './topo'
 import SpatialError from './SpatialError'
 
 /**
@@ -64,6 +64,7 @@ export function addIsoNode (topo, coordinate) {
 
   if (!tree.collides(node)) {
     insertNode(topo, node)
+    trigger(topo, 'addnode', node)
     return node
   } else {
     throw new SpatialError('coincident node')

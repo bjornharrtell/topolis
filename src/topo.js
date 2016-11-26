@@ -48,6 +48,8 @@ export function createTopology (name, srid, tolerance) {
     universe,
     getNodeByPoint: (...args) => node.getNodeByPoint(topo, ...args),
     addIsoNode: (...args) => node.addIsoNode(topo, ...args),
+    getEdgeByPoint: (...args) => edge.getEdgeByPoint(topo, ...args),
+    getEdgesByLine: (...args) => edge.getEdgesByLine(topo, ...args),
     addIsoEdge: (...args) => edge.addIsoEdge(topo, ...args),
     addEdgeNewFaces: (...args) => edge.addEdgeNewFaces(topo, ...args),
     addEdgeModFace: (...args) => edge.addEdgeModFace(topo, ...args),
@@ -91,7 +93,6 @@ export function insertFace (topo, face) {
   const { faces } = topo
   face.id = faces.length
   faces.push(face)
-  trigger(topo, 'addface', face)
 }
 
 export function deleteFace (topo, face) {
@@ -99,7 +100,6 @@ export function deleteFace (topo, face) {
   // topo.facesTree.remove(face)
   delete faces[faces.indexOf(face)]
   // faces.splice(faces.indexOf(face), 1)
-  trigger(topo, 'removeface', face)
 }
 
 export function insertEdge (topo, edge) {
@@ -113,7 +113,6 @@ export function insertEdge (topo, edge) {
   edge.maxY = Math.max(...ys)
   edgesTree.insert(edge)
   edges.push(edge)
-  trigger(topo, 'addedge', edge)
 }
 
 export function deleteEdge (topo, edge) {
@@ -121,7 +120,6 @@ export function deleteEdge (topo, edge) {
   edgesTree.remove(edge)
   delete edges[edges.indexOf(edge)]
   // edges.splice(edges.indexOf(edge), 1)
-  trigger(topo, 'removeedge', edge)
 }
 
 export function insertNode (topo, node) {
@@ -137,7 +135,6 @@ export function insertNode (topo, node) {
 
   nodesTree.insert(node)
   nodes.push(node)
-  trigger(topo, 'addnode', node)
 }
 
 export function deleteNode (topo, node) {
@@ -145,5 +142,4 @@ export function deleteNode (topo, node) {
   nodesTree.remove(node)
   delete nodes[nodes.indexOf(node)]
   // nodes.splice(nodes.indexOf(node), 1)
-  trigger(topo, 'removenode', node)
 }

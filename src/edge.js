@@ -85,7 +85,7 @@ export function getEdgesByLine (topo, cs) {
  * @return {module:edge~Edge}
  */
 export function addIsoEdge (topo, start, end, coordinates) {
-  const { edges, edgesTree } = topo
+  const { edges } = topo
 
   const xs = coordinates.map(c => c[0])
   const ys = coordinates.map(c => c[1])
@@ -141,6 +141,8 @@ export function addIsoEdge (topo, start, end, coordinates) {
   delete end.face
 
   insertEdge(topo, edge)
+  trigger(topo, 'addedge', edge)
+
   return edge
 }
 
@@ -452,6 +454,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
   }
 
   if (!isClosed && (epan.wasIsolated || span.wasIsolated)) {
+    trigger(topo, 'addedge', edge)
     return edge
   }
 
@@ -463,6 +466,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
     newface1 = addFaceSplit(topo, edge, false, edge.leftFace, false)
     if (newface1 === 0) {
       console.debug('New edge does not split any face')
+      trigger(topo, 'addedge', edge)
       return edge
     }
   }
@@ -472,6 +476,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
   if (modFace) {
     if (newface === 0) {
       console.debug('New edge does not split any face')
+      trigger(topo, 'addedge', edge)
       return edge
     }
 
@@ -485,8 +490,11 @@ function addEdge (topo, start, end, coordinates, modFace) {
     }
   }
 
+  trigger(topo, 'addedge', edge)
+
   if (oldFace !== topo.universe && !modFace) {
     deleteFace(topo, oldFace)
+    trigger(topo, 'removeface', oldFace)
   }
 
   return edge
@@ -648,7 +656,12 @@ function remEdge (topo, edge, modFace) {
     }
   }
 
-  deletedFaces.forEach(f => deleteFace(topo, f))
+  newface = modFace ? floodface : newface
+
+  deletedFaces.forEach(f => { deleteFace(topo, f); trigger(topo, 'removeface', f) })
+
+  trigger(topo, 'removeedge', edge)
+  trigger(topo, 'addface', newface)
 
   return modFace ? floodface : newface
 }
@@ -724,6 +737,7 @@ export function modEdgeSplit (topo, edge, coordinate) {
     .filter(e => e.nextLeft === edge && !e.nextLeftDir && e.end === oldEnd && e !== newedge1)
     .forEach(e => { e.nextLeft = newedge1; e.nextLeftDir = false })
 
+  trigger(topo, 'addnode', node)
   trigger(topo, 'modedge', edge)
 
   return node

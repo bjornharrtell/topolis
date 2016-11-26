@@ -1,7 +1,7 @@
 /** @module */
 
 import { signedArea, pointInPoly, polygonize } from './utils'
-import { insertFace } from './topo'
+import { insertFace, trigger } from './topo'
 import { sid } from './edge'
 
 /**
@@ -208,6 +208,8 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
   })
 
   insertFace(topo, newFace)
+
+  trigger(topo, 'addface', newFace)
 
   return newFace
 }
