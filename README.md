@@ -5,6 +5,8 @@
 
 JavaScript library implementing two dimensional planar topology representation and operations modeled after ISO/IEC 13249-3 (SQL/MM).
 
+The code is largely a manual port of the implementation that can be found in PostGIS.
+
 [API documentation](https://bjornharrtell.github.io/topolis/0.1.0/apidocs).
 
 ## References
