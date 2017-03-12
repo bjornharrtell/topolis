@@ -7,6 +7,8 @@ JavaScript library implementing two dimensional planar topology representation a
 
 The code is largely a manual port of the implementation that can be found in PostGIS.
 
+DISCLAIMER: This is currently an early prototype.
+
 [API documentation](https://bjornharrtell.github.io/topolis/0.1.0/apidocs).
 
 ## References
