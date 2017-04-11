@@ -1,11 +1,11 @@
-import Coordinate from '../node_modules/jsts/src/org/locationtech/jts/geom/Coordinate'
-import GeometryFactory from '../node_modules/jsts/src/org/locationtech/jts/geom/GeometryFactory'
-import IsSimpleOp from '../node_modules/jsts/src/org/locationtech/jts/operation/IsSimpleOp'
-import RelateOp from '../node_modules/jsts/src/org/locationtech/jts/operation/relate/RelateOp'
-import DistanceOp from '../node_modules/jsts/src/org/locationtech/jts/operation/distance/DistanceOp'
-import Polygonizer from '../node_modules/jsts/src/org/locationtech/jts/operation/polygonize/Polygonizer'
-import BoundaryNodeRule from '../node_modules/jsts/src/org/locationtech/jts/algorithm/BoundaryNodeRule'
-import LengthIndexedLine from '../node_modules/jsts/src/org/locationtech/jts/linearref/LengthIndexedLine'
+import Coordinate from 'jsts/org/locationtech/jts/geom/Coordinate'
+import GeometryFactory from 'jsts/org/locationtech/jts/geom/GeometryFactory'
+import IsSimpleOp from 'jsts/org/locationtech/jts/operation/IsSimpleOp'
+import RelateOp from 'jsts/org/locationtech/jts/operation/relate/RelateOp'
+import DistanceOp from 'jsts/org/locationtech/jts/operation/distance/DistanceOp'
+import Polygonizer from 'jsts/org/locationtech/jts/operation/polygonize/Polygonizer'
+import BoundaryNodeRule from 'jsts/org/locationtech/jts/algorithm/BoundaryNodeRule'
+import LengthIndexedLine from 'jsts/org/locationtech/jts/linearref/LengthIndexedLine'
 
 const factory = new GeometryFactory()
 const isSimpleOp = new IsSimpleOp()
