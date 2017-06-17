@@ -4,8 +4,7 @@ import rbush from 'rbush'
 
 import * as node from './node'
 import * as edge from './edge'
-import * as face from './face'
-import { getFaceGeometry } from './face'
+import { getFaceGeometry, default as face } from './face'
 
 /**
  * Topology structure

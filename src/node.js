@@ -31,12 +31,8 @@ export function getNodeByPoint (topo, coordinate) {
     maxX: coordinate[0],
     maxY: coordinate[1]
   })
-  if (result.length === 0) {
-    return
-  }
-  if (result.length === 1) {
-    return result[0]
-  }
+  if (result.length === 0) return
+  if (result.length === 1) return result[0]
   throw Error('getNodeByPoint: unexpected search result')
 }
 
@@ -72,9 +68,7 @@ export function addIsoNode (topo, coordinate) {
 }
 
 export function removeIsoNode (topo, node) {
-  if (!node.face) {
-    throw new SpatialError('not isolated node')
-  }
+  if (!node.face) throw new SpatialError('not isolated node')
   deleteNode(topo, node)
   trigger(topo, 'removenode', node)
 }

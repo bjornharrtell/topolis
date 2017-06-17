@@ -4,7 +4,7 @@
  * - Array.prototype.fill, License: CC0 */
 
 if (!('fill' in Array.prototype)) {
-  Object.defineProperty(Array.prototype, 'fill', {
+  Object.defineProperty(Array.prototype, 'fill', { // eslint-disable-line
     configurable: true,
     value: function fill (value) {
       if (this === undefined || this === null) {

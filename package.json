@@ -17,8 +17,12 @@
     "babel-plugin-external-helpers": "6.22.0",
     "babel-preset-env": "1.5.2",
     "babel-register": "6.24.1",
+    "chai": "4.0.2",
     "coveralls": "2.13.1",
-    "expect.js": "0.3.1",
+    "eslint": "4.0.0",
+    "eslint-config-standard": "10.2.1",
+    "eslint-plugin-promise": "3.5.0",
+    "eslint-plugin-standard": "3.0.1",
     "git-rev-sync": "1.9.1",
     "jsdoc": "jsdoc3/jsdoc",
     "jsts": "1.4.0",
@@ -31,8 +35,7 @@
     "rollup-plugin-commonjs": "8.0.2",
     "rollup-plugin-node-resolve": "3.0.0",
     "rollup-plugin-replace": "1.1.1",
-    "rollup-plugin-uglify": "2.0.1",
-    "standard": "10.0.2"
+    "rollup-plugin-uglify": "2.0.1"
   },
   "repository": {
     "type": "git",

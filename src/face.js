@@ -100,9 +100,7 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
 
   sedges.forEach((se, i) => console.debug(`Component ${i} in ring of edge ${edge.id} is edge ${sid(se.edge, se.dir)}`))
 
-  if (sedges.length === 0) {
-    throw new Error('no ring edges for edge' + edge.id)
-  }
+  if (sedges.length === 0) throw new Error('no ring edges for edge' + edge.id)
 
   console.debug(`getRingEdges returned ${sedges.length} edges`)
 
@@ -113,9 +111,7 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
 
   console.debug(`Edge ${sid(edge, dir)} split face ${face.id} (mbr_only:${mbrOnly})`)
 
-  const newFace = {
-    id: topo.facesSeq
-  }
+  const newFace = { id: topo.facesSeq }
 
   // const ringEdges = sedges.map(se => se.edge).filter((elem, pos, arr) => arr.indexOf(elem) === pos)
 
@@ -174,15 +170,11 @@ export function addFaceSplit (topo, edge, dir, face, mbrOnly) {
           e.rightFace = newFace
         }
         found++
-        if (found === 2) {
-          return false
-        }
+        if (found === 2) return false
       }
       return true
     })
-    if (found > 0) {
-      return
-    }
+    if (found > 0) return
 
     const ep = getInteriorEdgePoint(edge.coordinates)
     const contains = pointInPoly(ep, shell)

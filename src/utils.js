@@ -161,21 +161,15 @@ export function calcWindingNumber (c, shell) {
       const vb = shell[i + 1]
       if (vb[1] > c[1]) {
         const l = isLeft(va, vb, c)
-        if (l > 0) {
-          wn++
-        } else if (l === 0) {
-          return 0
-        }
+        if (l > 0) wn++
+        else if (l === 0) return 0
       }
     } else {
       const vb = shell[i + 1]
       if (vb[1] <= c[1]) {
         const l = isLeft(va, vb, c)
-        if (l < 0) {
-          wn--
-        } else if (l === 0) {
-          return 0
-        }
+        if (l < 0) wn--
+        else if (l === 0) return 0
       }
     }
   }

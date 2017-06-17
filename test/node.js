@@ -1,4 +1,4 @@
-import expect from 'expect.js'
+import { expect } from 'chai'
 
 import { createTopology } from '../src/topo'
 
@@ -12,14 +12,14 @@ describe('node', () => {
   describe('addIsoNode', () => {
     it('should be able to add a single node to an empty topology', () => {
       const node = topo.addIsoNode([0, 0])
-      expect(node).to.ok()
+      expect(node).to.exist
     })
     it('should refuse to add overlapping nodes to an empty topology', () => {
       const node = topo.addIsoNode([0, 0])
-      expect(node).to.ok()
+      expect(node).to.exist
       expect(() => {
         topo.addIsoNode([0, 0])
-      }).to.throwException(/^coincident node$/)
+      }).to.throw(/^coincident node$/)
     })
   })
 })

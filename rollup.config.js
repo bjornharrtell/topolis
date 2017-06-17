@@ -1,10 +1,11 @@
-var pjson = require('./package.json')
 import git from 'git-rev-sync'
 import replace from 'rollup-plugin-replace'
 import babel from 'rollup-plugin-babel'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
 import uglify from 'rollup-plugin-uglify'
+
+var pjson = require('./package.json')
 
 const banner = `// topolis. See https://github.com/bjornharrtell/topolis
 // Licenses:

@@ -549,15 +549,9 @@ function remEdge (topo, edge, modFace) {
   let lnodeEdges = 0
 
   updEdge.forEach(e => {
-    if (e === edge) {
-      return
-    }
-    if (e.start === edge.start || e.end === edge.start) {
-      fnodeEdges++
-    }
-    if (e.start === edge.end || e.end === edge.end) {
-      lnodeEdges++
-    }
+    if (e === edge) return
+    if (e.start === edge.start || e.end === edge.start) fnodeEdges++
+    if (e.start === edge.end || e.end === edge.end) lnodeEdges++
     if (e.nextLeft === edge && !e.nextLeftDir) {
       updEdgeLeft.push({
         edge: e,
@@ -647,21 +641,14 @@ function remEdge (topo, edge, modFace) {
 
   deleteEdge(topo, edge)
 
-  if (!fnodeEdges) {
-    edge.start.face = floodface
-  }
-  if (edge.end !== edge.start && !lnodeEdges) {
-    edge.end.face = floodface
-  }
+  if (!fnodeEdges) edge.start.face = floodface
+
+  if (edge.end !== edge.start && !lnodeEdges) edge.end.face = floodface
 
   const deletedFaces = []
   if (oldLeftFace !== oldRightFace) {
-    if (oldRightFace !== floodface) {
-      deletedFaces.push(oldRightFace)
-    }
-    if (oldLeftFace !== floodface) {
-      deletedFaces.push(oldLeftFace)
-    }
+    if (oldRightFace !== floodface) deletedFaces.push(oldRightFace)
+    if (oldLeftFace !== floodface) deletedFaces.push(oldLeftFace)
   }
 
   newface = modFace ? floodface : newface
@@ -687,7 +674,7 @@ export function remEdgeModFace (topo, edge) {
 }
 
 function healEdges (topo, e1, e2, modEdge) {
-  return
+  return undefined
 }
 
 export function modEdgeHeal (topo, e1, e2) {
@@ -756,5 +743,5 @@ export function modEdgeSplit (topo, edge, coordinate) {
 }
 
 export function newEdgesSplit (topo, edge, coordinate, skipISOChecks) {
-  return
+  return undefined
 }
