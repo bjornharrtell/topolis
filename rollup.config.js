@@ -28,7 +28,7 @@ export default {
       presets: [['env', {
         modules: false,
         targets: {
-          browsers: ['last 2 versions', 'ie >= 11']
+          browsers: ['> 2%']
         }
       }]],
       plugins: [

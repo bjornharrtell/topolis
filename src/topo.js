@@ -4,7 +4,7 @@ import rbush from 'rbush'
 
 import * as node from './node'
 import * as edge from './edge'
-import { getFaceGeometry, default as face } from './face'
+import { getRingEdges, getFaceGeometry } from './face'
 
 /**
  * Topology structure
@@ -79,7 +79,7 @@ export function createTopology (name, srid, tolerance) {
     modEdgeSplit: (...args) => edge.modEdgeSplit(topo, ...args),
     newEdgeHeal: (...args) => edge.newEdgeHeal(topo, ...args),
     modEdgeHeal: (...args) => edge.modEdgeHeal(topo, ...args),
-    getRingEdges: (...args) => face.getRingEdges(topo, ...args),
+    getRingEdges: (...args) => getRingEdges(topo, ...args),
     getFaceGeometry: (...args) => getFaceGeometry(topo, ...args),
     observers: {
       'addface': [],
