@@ -22,10 +22,6 @@ function toPoint (c) {
   return factory.createPoint(new Coordinate(c[0], c[1]))
 }
 
-function toPolygon (coordinates) {
-  return factory.createPolygon(coordinates.map(c => new Coordinate(c[0], c[1])))
-}
-
 function polyToCoordss (poly) {
   const cs = lineStringToCoords(poly.getExteriorRing())
   return [cs]
@@ -147,25 +143,21 @@ export function distance (c, cs) {
 }
 
 export function pointInPoly (c, shell) {
-  // return calcWindingNumber(c, shell) !== 0
-  const point = toPoint(c)
-  const polygon = toPolygon(shell)
-  return RelateOp.contains(polygon, point)
+  return calcWindingNumber(c, shell) !== 0
 }
 
 export function calcWindingNumber (c, shell) {
   let wn = 0
   for (let i = 0; i < shell.length - 1; i++) {
     const va = shell[i]
+    const vb = shell[i + 1]
     if (va[1] <= c[1]) {
-      const vb = shell[i + 1]
       if (vb[1] > c[1]) {
         const l = isLeft(va, vb, c)
         if (l > 0) wn++
         else if (l === 0) return 0
       }
     } else {
-      const vb = shell[i + 1]
       if (vb[1] <= c[1]) {
         const l = isLeft(va, vb, c)
         if (l < 0) wn--
