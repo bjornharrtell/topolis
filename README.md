@@ -1,7 +1,7 @@
 ## topolis ![Logo](https://cdn.rawgit.com/bjornharrtell/topolis/master/logo.svg)
 
 [![Build Status](https://travis-ci.org/bjornharrtell/topolis.svg)](https://travis-ci.org/bjornharrtell/topolis)
-[![Coverage Status](https://coveralls.io/repos/github/bjornharrtell/topolis/badge.svg?branch=master)](https://coveralls.io/github/bjornharrtell/topolis?branch=master)
+[![codecov](https://codecov.io/gh/bjornharrtell/topolis/branch/master/graph/badge.svg)](https://codecov.io/gh/bjornharrtell/topolis)
 
 JavaScript library implementing two dimensional planar topology representation and operations modeled after ISO/IEC 13249-3 (SQL/MM).
 
