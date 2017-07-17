@@ -30,9 +30,59 @@ import { getRingEdges, getFaceGeometry } from './face'
  * @property {function} newEdgesSplit Calls {@link module:edge.newEdgesSplit} in the context of this object
  * @property {function} modEdgeSplit Calls {@link module:edge.modEdgeSplit} in the context of this object
  * @property {function} newEdgeHeal Calls {@link module:edge.newEdgeHeal} in the context of this object
- * @property {function} modEdgeHeal Calls {@link module:edge.modEdgeHeal} in the context of this object
  * @property {function} getRingEdges Calls {@link module:face.getRingEdges} in the context of this object
  * @property {function} getFaceGeometry Calls {@link module:face.getFaceGeometry} in the context of this object
+ * @property {function} on Calls {@link module:topo.on} in the context of this object
+ * @property {function} un Calls {@link module:topo.un} in the context of this object
+ * @fires module:topo~addface
+ * @fires module:topo~removeface
+ * @fires module:topo~addedge
+ * @fires module:topo~modedge
+ * @fires module:topo~removeedge
+ * @fires module:topo~addnode
+ * @fires module:topo~removenode
+ */
+
+/**
+ * Emitted when a face has been added to the topology.
+ * @event module:topo~addface
+ * @type {module:face~Face}
+ */
+
+/**
+ * Emitted when a face has been removed from the topology.
+ * @event module:topo~removeface
+ * @type {module:face~Face}
+ */
+
+/**
+ * Emitted when an edge has been added to the topology.
+ * @event module:topo~addedge
+ * @type {module:edge~Edge}
+ */
+
+/**
+ * Emitted when an edge has been modified.
+ * @event module:topo~modedge
+ * @type {module:edge~Edge}
+ */
+
+/**
+ * Emitted when an edge has been removed from the topology.
+ * @event module:topo~removeedge
+ * @type {module:edge~Edge}
+ */
+
+/**
+ * Emitted when a node has been added to the topology.
+ * @event module:topo~addnode
+ * @type {module:node~Node}
+ */
+
+/**
+ * Emitted when a node has been removed from the topology.
+ * @event module:topo~removenode
+ * @type {module:node~Node}
  */
 
 /**
@@ -91,15 +141,28 @@ export function createTopology (name, srid, tolerance) {
       'addnode': [],
       'removenode': []
     },
-    on: (...args) => on(topo, ...args)
+    on: (...args) => on(topo, ...args),
+    un: (...args) => un(topo, ...args)
   }
   return topo
 }
 
+/**
+ * Registers a callback for a named event
+ * @param {module:topo~Topo} topo Topology instance.
+ * @param {string} name Event name.
+ * @param {function} callback Callback function.
+ */
 export function on (topo, name, callback) {
   topo.observers[name].push(callback)
 }
 
+/**
+ * Unregisters a callback for a named event
+ * @param {module:topo~Topo} topo Topology instance.
+ * @param {string} name Event name.
+ * @param {function} callback Callback function.
+ */
 export function un (topo, name, callback) {
   const i = topo.observers[name].indexOf(callback)
   topo.observers[name].splice(i, 1)

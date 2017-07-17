@@ -9,8 +9,8 @@ import SpatialError from './SpatialError'
  *
  * @typedef {Object} Node
  * @property {number} id Node ID
- * @property {object} face Containing face
- * @property {number[]} coordinate Coordinate
+ * @property {module:face~Face} face Containing face
+ * @property {module:coordinate~Coordinate} coordinate Coordinate
  * @property {number} minX Minimum X of bounds
  * @property {number} maxY Maximum Y of bounds
  * @property {number} minX Minimum X of bounds
@@ -21,7 +21,7 @@ import SpatialError from './SpatialError'
  * Find the node at a point location.
  *
  * @param {module:topo~Topo} topo
- * @param {number[]} coordinate
+ * @param {module:coordinate~Coordinate} coordinate
  * @return {module:node~Node}
  */
 export function getNodeByPoint (topo, coordinate) {
@@ -40,7 +40,7 @@ export function getNodeByPoint (topo, coordinate) {
  * Adds an isolated node to a face in a topology and returns the new node. If face is null, the node is still created.
  *
  * @param {module:topo~Topo} topo
- * @param {number[]} coordinate
+ * @param {module:coordinate~Coordinate} coordinate
  * @return {module:node~Node}
  */
 export function addIsoNode (topo, coordinate) {

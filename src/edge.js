@@ -12,7 +12,7 @@ import { addFaceSplit } from './face'
  * @property {number} id Edge ID
  * @property {module:node~Node} start
  * @property {module:node~Node} end
- * @property {number[][]} coordinates Coordinates
+ * @property {module:coordinate~Coordinate[]} coordinates Coordinates
  * @property {module:edge~Edge} nextLeft
  * @property {module:edge~Edge} nextRight
  * @property {module:face~Face} leftFace
@@ -30,6 +30,7 @@ console.debug = function () {}
  * @param {module:edge~Edge} e
  * @param {boolean} d
  * @return {number}
+ * @private
  */
 export function sid (e, d) {
   return d ? e.id : -e.id
@@ -38,6 +39,7 @@ export function sid (e, d) {
 /**
  * @param {module:edge~Edge} e
  * @return {string}
+ * @private
  */
 export function e2s (e) {
   const nl = sid(e.nextLeft, e.nextLeftDir)
@@ -83,7 +85,7 @@ export function getEdgesByLine (topo, cs) {
  * @param {module:topo~Topo} topo
  * @param {module:node~Node} start
  * @param {module:node~Node} end
- * @param {number[][]} coordinates
+ * @param {module:coordinate~Coordinate[]} coordinates
  * @return {module:edge~Edge}
  */
 export function addIsoEdge (topo, start, end, coordinates) {
@@ -509,7 +511,7 @@ function addEdge (topo, start, end, coordinates, modFace) {
  * @param {module:topo~Topo} topo
  * @param {module:node~Node} start
  * @param {module:node~Node} end
- * @param {number[][]} coordinates
+ * @param {module:coordinate~Coordinate[]} coordinates
  * @return {module:edge~Edge}
  */
 export function addEdgeNewFaces (topo, start, end, coordinates) {
@@ -520,9 +522,9 @@ export function addEdgeNewFaces (topo, start, end, coordinates) {
  * Add a new edge and, if in doing so it splits a face, modify the original face and add a new face.
  *
  * @param {module:topo~Topo} topo
- * @param {module:node~Node[]} start
+ * @param {module:node~Node} start
  * @param {module:node~Node} end
- * @param {number[][]} coordinates
+ * @param {module:coordinate~Coordinate[]} coordinates
  * @return {module:edge~Edge}
  */
 export function addEdgeModFace (topo, start, end, coordinates) {
