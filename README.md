@@ -9,7 +9,7 @@ The code is largely a manual port of the implementation that can be found in Pos
 
 DISCLAIMER: This is currently an early prototype.
 
-[API documentation](https://bjornharrtell.github.io/topolis/0.1.0/apidocs).
+[API documentation](https://bjornharrtell.github.io/topolis/0.2.0/apidocs).
 
 ## References
 
