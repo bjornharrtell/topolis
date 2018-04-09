@@ -55,7 +55,7 @@ export function getEdgeByPoint (topo, c, tol) {
     maxY: c[1] + tol
   })
 
-  const candidates = result.filter(e => distance(c, e.coordinates) < tol)
+  const candidates = result.filter(e => distance(c, e.coordinates) <= tol)
 
   // TODO: throw exception on more than one candidate?
 
