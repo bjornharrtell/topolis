@@ -3,7 +3,7 @@ import replace from 'rollup-plugin-replace'
 import babel from 'rollup-plugin-babel'
 import resolve from 'rollup-plugin-node-resolve'
 import commonjs from 'rollup-plugin-commonjs'
-import uglify from 'rollup-plugin-uglify'
+import { terser }  from 'rollup-plugin-terser'
 
 var pjson = require('./package.json')
 
@@ -13,10 +13,12 @@ const banner = `// topolis. See https://github.com/bjornharrtell/topolis
 `
 
 export default {
-  entry: 'src/topolis.js',
-  format: 'umd',
-  moduleName: 'topolis',
-  banner,
+  input: 'src/topolis.js',
+  output: {
+    format: 'umd',
+    name: 'topolis',
+    banner,
+  },
   plugins: [
     replace({
       npm_package_version: pjson.version,
@@ -25,18 +27,18 @@ export default {
     resolve(),
     commonjs(),
     babel({
-      presets: [['env', {
+      presets: [['@babel/env', {
         modules: false,
         targets: {
           browsers: ['> 2%']
         }
       }]],
       plugins: [
-        'external-helpers'
+        '@babel/plugin-external-helpers'
       ],
       babelrc: false
     }),
-    uglify({
+    terser({
       output: {
         comments: (node, token) => token.line < 4
       }

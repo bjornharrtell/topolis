@@ -1,6 +1,6 @@
 /** @module */
 
-import rbush from 'rbush'
+import RBush from 'rbush'
 
 import * as node from './node'
 import * as edge from './edge'
@@ -95,12 +95,12 @@ import { getRingEdges, getFaceGeometry } from './face'
  */
 export function createTopology (name, srid, tolerance) {
   const nodes = []
-  const nodesTree = rbush(16)
+  const nodesTree = new RBush(16)
   const edges = []
-  const edgesTree = rbush(16)
+  const edgesTree = new RBush(16)
   const universe = { id: 0 }
   const faces = [universe]
-  const facesTree = rbush(16)
+  const facesTree = new RBush(16)
   const topo = {
     name,
     srid,
