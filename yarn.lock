@@ -1832,10 +1832,10 @@ json5@^2.1.0:
   dependencies:
     minimist "^1.2.0"
 
-jsts@2.0.4:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/jsts/-/jsts-2.0.4.tgz#5fb91aaea070ebedf0121454ed90b074027e8241"
-  integrity sha512-YCfCuEgG9ynMFazjIH0YAtliFlaIcYmRqBY6EQP+VjNDEjuu4Il+91RDQWP4hAS7TXOeN/NYF/OL7Fmvg69pKg==
+jsts@2.0.6:
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/jsts/-/jsts-2.0.6.tgz#8ea783b26bd65cba6371dbdb9088433913fe24d9"
+  integrity sha512-rpWt1+9dzN47dmAb+jeD9OwErkI5WJgfvFqzf/hpR3LHDsMA9kr+uFIYYfRMYaMgMMLQCIIBr2bCpc5Lnmn7hA==
 
 klaw@^3.0.0:
   version "3.0.0"
