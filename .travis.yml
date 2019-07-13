@@ -4,6 +4,6 @@ cache:
   directories:
     - node_modules
 node_js:
-  - "6"
+  - "10"
 sudo: false
 after_success: yarn run coverage
