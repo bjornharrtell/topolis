@@ -16,3 +16,4 @@ DISCLAIMER: This is currently an early prototype.
 * https://docs.oracle.com/cd/B19306_01/appdev.102/b14256/sdo_topo_concepts.htm
 * http://postgis.net/docs/manual-2.3/Topology.html
 * https://www.gaia-gis.it/fossil/libspatialite/wiki?name=ISO+Topology
+
