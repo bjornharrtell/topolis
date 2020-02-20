@@ -33,9 +33,6 @@ export default {
           browsers: ['> 2%']
         }
       }]],
-      plugins: [
-        '@babel/plugin-external-helpers'
-      ],
       babelrc: false
     }),
     terser({
